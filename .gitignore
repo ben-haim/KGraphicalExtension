@@ -1,6 +1,2 @@
-*
-!*.java
-!*.q
-!*.k
-!pom.xml
-!README.md
+.idea/*
+*.iml
