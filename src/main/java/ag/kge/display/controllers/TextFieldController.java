@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,7 +15,7 @@ public class TextFieldController extends AbstractController {
     private final JTextField textField;
     private KType currentType;
 
-    protected TextFieldController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
+    public TextFieldController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
         super(infoDict, outQueue);
 
         /*
@@ -32,16 +31,54 @@ public class TextFieldController extends AbstractController {
                 updateServer();
             }
         });
-        this.setBorder(new TitledBorder(infoDict.get("label").toString()));
+        setName(infoDict.get("name").toString());
+        setBorder(new TitledBorder(infoDict.get("label").toString()));
     }
 
     @Override
-    protected void updateServer() {
+    public void updateServer() {
+        //variables names are stored using namespace indexing
+        String t = textField.getText();
+        String[] n = getName().split("\\.");
+        String m;
 
+        //set up assignment into variable
+
+        if (n.length == 1){
+            //atom
+            m = n[0] + ":";
+        } else {
+            //is list, use dot indexing
+            //raze over
+            m = ".["+ n[0] + ";,/" ;
+
+            for (int i = 1; i < n.length; i++){
+                m+= "`" + n[i];
+            }
+        }
+
+        m += ";:;";
+
+        if (currentType == KType.NUMERIC && KType.isNumeric(t)){
+            //only time numeric data is reflected on server is when both current type and
+            //text field text are numeric
+            m += t;
+        } else {
+            m += "\"" + t + "\""; //set it up as a char array
+            if (currentType != KType.C_ARRAY) {
+                //set to symbol if it's not a char array
+                m = "`$" + m;
+            }
+        }
+
+        m += "];";
+
+        //put the resulting string on to the outbound queue
+        outQueue.add(m);
     }
 
     @Override
-    protected String filterData(Object data) {
+    public String filterData(Object data) {
         KType type = KType.getTypeOf(data);
         if (type == KType.C_ARRAY)
             return new String((char[]) data);
@@ -63,15 +100,24 @@ public class TextFieldController extends AbstractController {
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
             Object data = stack.pop();
+                //if the data isn't a single character, or the index isn't an int, leave
+            if (!(data instanceof Character) || !(head instanceof Integer))
+                return;
 
-            //the index references  multiple positions
-            if (head instanceof int[] &&
-                    data instanceof char[]) {
-                String current  = textField.getText();
-                for (int i = 0 ; i < Array.getLength(head);i++){
+            String current  = textField.getText();
+            int index = (int) head;
+            char charData  = (char) data;
 
-                }
-            }
+            //replaces character, will need testing, not sure this actually works
+            String newText =
+                    current.substring(0,index-1) +
+                    data + current.substring(index, current.length());
+
+            //the fact that there is an index means the variable is a char array
+            currentType = KType.C_ARRAY;
+
+            textField.setText(newText);
+
         } else { //the head is the complete data
             currentType = KType.getTypeOf(head);
             textField.setText(filterData(head));
@@ -79,9 +125,4 @@ public class TextFieldController extends AbstractController {
 
     }
 
-    private String changeString(String oldString, int[] indices, char[] newChars){
-
-        for ()
-
-    }
 }

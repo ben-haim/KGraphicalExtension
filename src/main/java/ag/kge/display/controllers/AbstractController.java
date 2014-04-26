@@ -12,8 +12,17 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public abstract class AbstractController extends JPanel implements Observer{
 
-    protected enum KType {
+    public enum KType {
         STRING, NUMERIC, ATOM, C_ARRAY, ARRAY, UUID, DICT, TABLE;
+
+        public static boolean isNumeric(Object object){
+            try {
+                Double.parseDouble(object.toString());
+                return true;
+            } catch (NumberFormatException e){
+                return false;
+            }
+        }
 
         public static KType getTypeOf(Object object){
 
@@ -23,12 +32,8 @@ public abstract class AbstractController extends JPanel implements Observer{
             else if (object instanceof String) return STRING;
             else if (object instanceof java.util.UUID) return UUID;
             else if (object.getClass().isArray()) return ARRAY;
-            else try {
-                    Double.parseDouble(object.toString());
-                    return NUMERIC;
-                } catch (NumberFormatException e){
-                    return ATOM;
-                }
+            else if (isNumeric(object)) return NUMERIC;
+            else return ATOM;
 
         }
     }
@@ -36,13 +41,13 @@ public abstract class AbstractController extends JPanel implements Observer{
     protected final HashMap<String, Object> infoDict;
     protected final LinkedBlockingQueue<String> outQueue;
 
-    protected AbstractController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
+    public AbstractController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
         this.infoDict = infoDict;
         this.outQueue = outQueue;
     }
 
-    protected abstract void updateServer();
+    public abstract void updateServer();
 
-    protected abstract Object filterData(Object data);
+    public abstract Object filterData(Object data);
 
 }
