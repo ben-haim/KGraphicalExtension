@@ -1,5 +1,6 @@
 package ag.kge.display.controllers;
 
+import ag.kge.display.KType;
 import org.junit.*;
 
 import javax.swing.table.DefaultTableModel;
@@ -104,7 +105,7 @@ public class TextFieldControllerTest {
 
         topController = new TextFieldController(numTemplate, null);
         topController.getTextField().setText("45");
-        topController.setCurrentType(AbstractController.KType.NUMERIC);
+        topController.setCurrentType(KType.NUMERIC);
         assertEquals(topController.generateQuery(), "value:45;");
     }
 
@@ -113,7 +114,7 @@ public class TextFieldControllerTest {
 
         topController = new TextFieldController(charTemplate, null);
         topController.getTextField().setText("New Char Array");
-        topController.setCurrentType(AbstractController.KType.C_ARRAY);
+        topController.setCurrentType(KType.C_ARRAY);
         assertEquals(topController.generateQuery(),"value:\"Test Char Array\";");
 
     }
@@ -123,7 +124,7 @@ public class TextFieldControllerTest {
 
         topController = new TextFieldController(numTemplate,null);
         topController.getTextField().setText("Some Text");
-        topController.setCurrentType(AbstractController.KType.STRING);
+        topController.setCurrentType(KType.STRING);
         assertEquals(topController.generateQuery(),"value:`$\"Some Text\";");
     }
 
@@ -132,7 +133,7 @@ public class TextFieldControllerTest {
 
         topController = new TextFieldController(numTemplate,null);
         topController.getTextField().setText("Some Char Array");
-        topController.setCurrentType(AbstractController.KType.C_ARRAY);
+        topController.setCurrentType(KType.C_ARRAY);
         assertEquals(topController.generateQuery(),"value:\"Some Char Array\";");
     }
 
@@ -141,7 +142,7 @@ public class TextFieldControllerTest {
 
         topController = new TextFieldController(numTemplate,null);
         topController.update(null,atomUpdateStack);
-        assertEquals(topController.getCurrentType(), AbstractController.KType.STRING);
+        assertEquals(topController.getCurrentType(), KType.STRING);
     }
 
     @Test

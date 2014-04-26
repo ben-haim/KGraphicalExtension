@@ -1,5 +1,7 @@
 package ag.kge.display.controllers;
 
+import ag.kge.display.KType;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.event.ActionEvent;
