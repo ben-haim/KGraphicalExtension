@@ -1,7 +1,5 @@
 package ag.kge.display.controllers;
 
-import ag.kge.c;
-
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -13,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class AbstractController extends JPanel implements Observer{
 
     public enum KType {
-        STRING, NUMERIC, ATOM, C_ARRAY, ARRAY, UUID, DICT, TABLE;
+        STRING, NUMERIC, ATOM, C_ARRAY, ARRAY, UUID, DICT, TABLE, NULL;
 
         public static boolean isNumeric(Object object){
             try {
@@ -26,7 +24,8 @@ public abstract class AbstractController extends JPanel implements Observer{
 
         public static KType getTypeOf(Object object){
 
-            if (object instanceof HashMap) return DICT;
+            if (object == null) return NULL;
+            else if (object instanceof HashMap) return DICT;
             else if (object instanceof TableModel) return TABLE;
             else if (object instanceof char[]) return C_ARRAY;
             else if (object instanceof String) return STRING;
@@ -38,15 +37,12 @@ public abstract class AbstractController extends JPanel implements Observer{
         }
     }
 
-    protected final HashMap<String, Object> infoDict;
-    protected final LinkedBlockingQueue<String> outQueue;
+    protected String binding;
 
-    public AbstractController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
-        this.infoDict = infoDict;
-        this.outQueue = outQueue;
-    }
+    public AbstractController(HashMap<String, Object> template,
+                              final LinkedBlockingQueue<String> outQueue){}
 
-    public abstract void updateServer();
+    public abstract String generateQuery();
 
     public abstract Object filterData(Object data);
 

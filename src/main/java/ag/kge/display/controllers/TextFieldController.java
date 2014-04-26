@@ -13,68 +13,81 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TextFieldController extends AbstractController {
 
     private final JTextField textField;
+
     private KType currentType;
 
-    public TextFieldController(HashMap<String, Object> infoDict, LinkedBlockingQueue<String> outQueue) {
-        super(infoDict, outQueue);
+    public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
+        super(template, outQueue);
 
         /*
         At this point the data should also be in the infoDict so we can initialise
         the component with a get() call
         */
-        Object data = infoDict.get("data");
+        Object data = template.get("data");
+        binding = template.get("binding").toString();
         currentType = KType.getTypeOf(data);
-        textField = new JTextField(filterData(infoDict.get("data")));
+        textField = new JTextField(filterData(template.get("data")));
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateServer();
+                outQueue.add(generateQuery());
             }
         });
-        setName(infoDict.get("name").toString());
-        setBorder(new TitledBorder(infoDict.get("label").toString()));
+        setName(template.get("name").toString());
+        //label's should be a char array
+        setBorder(new TitledBorder(new String((char[]) template.get("label"))));
+    }
+
+    public JTextField getTextField() {
+        return textField;
+    }
+
+    public void setCurrentType(KType currentType) {
+        this.currentType = currentType;
+    }
+
+    public KType getCurrentType() {
+        return currentType;
     }
 
     @Override
-    public void updateServer() {
+    public String generateQuery() {
         //variables names are stored using namespace indexing
         String t = textField.getText();
-        String[] n = getName().split("\\.");
+        String[] n = binding.split("\\.");
         String m;
 
-        //set up assignment into variable
+        //set up amend into variable
+        if (n.length == 1) m = n[0] + ":"; //atom
+        else {
+            //list, use dot indexing, raze names
+            m = ".["+ n[0] + ";raze" ;
 
-        if (n.length == 1){
-            //atom
-            m = n[0] + ":";
-        } else {
-            //is list, use dot indexing
-            //raze over
-            m = ".["+ n[0] + ";,/" ;
+            for (int i = 1; i < n.length; i++)
+                m += "`" + n[i];
 
-            for (int i = 1; i < n.length; i++){
-                m+= "`" + n[i];
-            }
+            m += ";:;"; //add amend operator
         }
 
-        m += ";:;";
-
-        if (currentType == KType.NUMERIC && KType.isNumeric(t)){
-            //only time numeric data is reflected on server is when both current type and
-            //text field text are numeric
+        /*
+        only time numeric data is reflected on server is when both current type and
+        text field text are numeric
+        */
+        if (currentType == KType.NUMERIC && KType.isNumeric(t))
             m += t;
-        } else {
+        else {
             m += "\"" + t + "\""; //set it up as a char array
-            if (currentType != KType.C_ARRAY) {
-                //set to symbol if it's not a char array
+
+            //cast to symbol if it's not a char array
+            if (currentType != KType.C_ARRAY)
                 m = "`$" + m;
-            }
         }
 
-        m += "];";
+        if (n.length > 1)
+            m += "];"; //close dot indexing
+        else m+=";"; //otherwise just close statement
 
-        //put the resulting string on to the outbound queue
-        outQueue.add(m);
+        return m;
     }
 
     @Override
@@ -96,12 +109,13 @@ public class TextFieldController extends AbstractController {
 
         //pop off the head of the stack
         Object head = stack.pop();
-
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
             Object data = stack.pop();
-                //if the data isn't a single character, or the index isn't an int, leave
-            if (!(data instanceof Character) || !(head instanceof Integer))
+            //if the data isn't a single character, or the index isn't an int, leave
+            if (!(data instanceof Character) ||
+                    !(head instanceof Integer) ||
+                    !(currentType != KType.C_ARRAY))
                 return;
 
             String current  = textField.getText();
@@ -111,10 +125,7 @@ public class TextFieldController extends AbstractController {
             //replaces character, will need testing, not sure this actually works
             String newText =
                     current.substring(0,index-1) +
-                    data + current.substring(index, current.length());
-
-            //the fact that there is an index means the variable is a char array
-            currentType = KType.C_ARRAY;
+                    charData + current.substring(index, current.length());
 
             textField.setText(newText);
 
