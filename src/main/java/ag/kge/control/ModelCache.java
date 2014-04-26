@@ -3,7 +3,9 @@ package ag.kge.control;
 import ag.kge.c;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,7 +87,21 @@ public enum ModelCache {
      * @return the converted data
      */
     public synchronized Object parseData(Object data) {
-        return null;
+        if (data instanceof c.Dict){
+            HashMap<String, Object> hashMap = new HashMap<>();
+            c.Dict d = (c.Dict) data;
+            int i = 0;
+            if (c.at(d.x,0) == "") i++;
+
+            for (; i < Array.getLength(d.x); i++){
+                hashMap.put(c.at(d.x,i).toString(),
+                        parseData(c.at(d.y,i)));
+            }
+
+            return hashMap;
+        } else if (data instanceof c.Flip) {
+            return new KTableModel((c.Flip)data);
+        } else return data;
     }
 
     /**

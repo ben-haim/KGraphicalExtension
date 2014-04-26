@@ -19,7 +19,6 @@ public class TextFieldController extends AbstractController {
     private KType currentType;
 
     public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
-        super(template, outQueue);
 
         /*
         At this point the data should also be in the infoDict so we can initialise
@@ -38,6 +37,8 @@ public class TextFieldController extends AbstractController {
         setName(template.get("name").toString());
         //label's should be a char array
         setBorder(new TitledBorder(new String((char[]) template.get("label"))));
+        add(textField);
+
     }
 
     public JTextField getTextField() {
@@ -117,7 +118,7 @@ public class TextFieldController extends AbstractController {
             //if the data isn't a single character, or the index isn't an int, leave
             if (!(data instanceof Character) ||
                     !(head instanceof Integer) ||
-                    !(currentType != KType.C_ARRAY))
+                    (currentType != KType.C_ARRAY))
                 return;
 
             String current  = textField.getText();

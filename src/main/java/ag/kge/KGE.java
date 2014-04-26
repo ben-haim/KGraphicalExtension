@@ -6,7 +6,6 @@ import ag.kge.control.UpdateHandler;
 import ag.kge.display.RenderingEngine;
 
 import java.io.IOException;
-import java.util.Observer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -47,7 +46,7 @@ public class KGE {
 
         //control layer threads
         new Thread(new UpdateHandler(updateQueue)).start();
-        new Thread(new RenderingEngine(showQueue)).start();
+        new Thread(new RenderingEngine(showQueue, outQueue)).start();
 
     }
 }
