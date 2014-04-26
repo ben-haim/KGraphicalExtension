@@ -14,10 +14,14 @@ public class InboundHandler implements Runnable{
 
     private final c conn;
     private final LinkedBlockingQueue<Object[]> showQueue;
+    private final LinkedBlockingQueue<Object[]> updateQueue;
 
-    public InboundHandler(c conn, LinkedBlockingQueue<Object[]> showQueue) {
+    public InboundHandler(c conn,
+                          LinkedBlockingQueue<Object[]> showQueue,
+                          LinkedBlockingQueue<Object[]> updateQueue) {
         this.conn = conn;
         this.showQueue = showQueue;
+        this.updateQueue = updateQueue;
     }
 
     @Override
@@ -40,21 +44,14 @@ public class InboundHandler implements Runnable{
         String cmd = message[0].toString();
 
         switch (cmd){
-
-            case "show":
-                String name = message[1].toString();
-                //put description to
-                Object description= ModelCache.INSTANCE.parseData(message[2]);
-                showQueue.add(new Object[]{name, description});
+            case "show": showQueue.add(
+                    new Object[]{message[1], message[2]});
                 break;
-            case "hide":
-                FrameCache.INSTANCE.hideFrame(message[0].toString());
+            case "hide": FrameCache.INSTANCE.hideFrame(
+                    message[1].toString());
                 break;
-            case "update":
-                ModelCache.INSTANCE.updateModel(
-                        message[1], message[2], message[3]
-                );
-
+            case "update": updateQueue.add(
+                    new Object[]{message[1], message[2], message[3]});
                 break;
             case "kill": System.exit(0);
         }

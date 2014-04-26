@@ -3,7 +3,6 @@ package ag.kge.control;
 import ag.kge.c;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.Observable;
 import java.util.Observer;
@@ -35,60 +34,19 @@ public enum ModelCache {
     }
 
     /**
-     * Handles the update data that comes into the KGE, converting it into a stack and
-     * notifying the observers of the model to which it belongs.
+     * Sends a stack containing update data to the observers of a given variable
      *
-     * @param names the name of the updated variable, possibly an array
-     * @param indices the indices array
-     * @param value the value of the updated variable at the index
+     * @param name the name of the variable
+     * @param updateStack the stack containing the update data
      */
-    public synchronized void updateModel(Object names, Object indices, Object value) {
-
-        String name;
-
-        /*
-        The updates in the widget controllers are handled by popping off
-        a stack represented by the arraydeque, where the bottom of the stack
-        contains the data.
-
-        The popped value could be an index, in which case the widget should try
-        to call the update method on the child widget with the index
-        */
-        ArrayDeque<Object> updateStack = new ArrayDeque<>();
-
-        /*
-        The name that comes on the update message may be an array of strings.
-
-        For example, if a value in a dictionary of vectors gets updated,
-        instead of the key being part of the indices array, it will be another
-        string in the name, making it an array
-        */
-        if (names.getClass().isArray()){
-            //The first string in the name array is always the name of the
-            //container object
-            name = Array.get(names,0).toString();
-
-            //add the rest of the array to the deque
-            for (int i = 1; i < Array.getLength(names); i++){
-                updateStack.add(c.at(names, i));
-            }
-        } else {
-            name = names.toString();
-        }
-
-        //now we can check if the cache contains the data
-        if (!cache.contains(name)) return;
-
-        //if it does, put the rest of the indices array on the stack
-        for (int i = 0; i < Array.getLength(indices); i++){
-            updateStack.add(c.at(indices,i));
-        }
-
-        //add the actual data to the bottom of the stack/tail of deque
-        updateStack.add(value);
+    protected synchronized void updateModel(String name, ArrayDeque<Object> updateStack) {
 
         //call notify observers on the model
         cache.get(name).notifyObservers(updateStack);
+    }
+
+    public synchronized boolean checkExists(String name){
+        return cache.contains(name);
     }
 
     /**

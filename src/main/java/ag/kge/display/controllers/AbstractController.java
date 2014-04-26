@@ -1,7 +1,5 @@
 package ag.kge.display.controllers;
 
-import ag.kge.c;
-
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.util.*;

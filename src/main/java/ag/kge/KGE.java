@@ -2,8 +2,11 @@ package ag.kge;
 
 import ag.kge.comms.InboundHandler;
 import ag.kge.comms.OutboundHandler;
+import ag.kge.control.UpdateHandler;
+import ag.kge.display.RenderingEngine;
 
 import java.io.IOException;
+import java.util.Observer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -11,10 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class KGE {
 
-    public static int port;
-
     public static void main(String[] args) {
-
+        int port = 0;
         if (args.length == 1) try{
             port = Integer.parseInt(args[0]);
         } catch (NumberFormatException e){
@@ -38,9 +39,15 @@ public class KGE {
 
         final LinkedBlockingQueue<String> outQueue = new LinkedBlockingQueue<>();
         final LinkedBlockingQueue<Object[]> showQueue = new LinkedBlockingQueue<>();
+        final LinkedBlockingQueue<Object[]> updateQueue = new LinkedBlockingQueue<>();
 
-        new Thread(new InboundHandler(conn,showQueue)).start();
+        //communication layer threads
+        new Thread(new InboundHandler(conn,showQueue, updateQueue)).start();
         new Thread(new OutboundHandler(conn,outQueue)).start();
+
+        //control layer threads
+        new Thread(new UpdateHandler(updateQueue)).start();
+        new Thread(new RenderingEngine(showQueue)).start();
 
     }
 }
