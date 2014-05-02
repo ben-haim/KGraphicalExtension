@@ -48,7 +48,7 @@ public enum ModelCache {
     }
 
     public synchronized boolean checkExists(String name){
-        return cache.contains(name);
+        return cache.containsKey(name);
     }
 
     /**
