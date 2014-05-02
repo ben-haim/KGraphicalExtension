@@ -85,7 +85,8 @@ public class UpdateHandler implements Runnable {
         }
 
         //add the actual data to the bottom of the stack/tail of deque
-        updateStack.add(value);
+        //putting it through the parser first
+        updateStack.add(ModelCache.INSTANCE.parseData(value));
 
     }
 

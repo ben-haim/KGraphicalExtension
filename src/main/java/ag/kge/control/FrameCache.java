@@ -38,10 +38,12 @@ public enum FrameCache {
                                            final LinkedBlockingQueue<String> outQueue) {
 
         JFrame frame = new JFrame();
-
+        AbstractController c;
         if (template.get("class").equals("panel")){
             //create a panel
-            frame.setContentPane(new PanelController(template,outQueue));
+            frame.setContentPane(c = new PanelController(template,outQueue));
+            if (template.containsKey("binding"))
+                ModelCache.INSTANCE.addObserver(template.get("binding").toString(), c);
         } else {
             //just add a default controller
             JPanel topPanel = new JPanel();
@@ -50,7 +52,7 @@ public enum FrameCache {
             for (Object x: template.values()){
                 if (x instanceof HashMap){
                     HashMap h = (HashMap) x;
-                    AbstractController c = new TextFieldController(h,outQueue);
+                    c = new TextFieldController(h,outQueue);
 
                     if (h.containsKey("binding")){ //add to model cache as observer
                         ModelCache.INSTANCE.addObserver(h.get("binding").toString(),c);

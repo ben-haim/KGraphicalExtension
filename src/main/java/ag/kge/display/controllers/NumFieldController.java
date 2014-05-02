@@ -27,7 +27,7 @@ public class NumFieldController extends AbstractController {
         */
 
         binding = template.get("binding").toString();
-        textField = new JTextField(filterData(template.get("data")));
+        textField = new JTextField(template.get("data").toString());
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

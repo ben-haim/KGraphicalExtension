@@ -37,7 +37,7 @@ public class ShowHandler implements Runnable {
 
 
     /**
-     * Parses a c.Dict into a pre-formatted hashmap, defaulting values for class and label.
+     * Parses a c.Dict into a pre-formatted hashmap, defaulting values for class, label, etc..
      *
      * @param name
      * @param infoDict
@@ -49,6 +49,11 @@ public class ShowHandler implements Runnable {
         int i = 0;
         if (c.at(infoDict.x,0) == "") i++;
         String currentX; Object currentY;
+
+        //pre-format
+        description.put("class","data");
+        description.put("width",1);
+        description.put("height",1);
 
         for (; i < Array.getLength(infoDict.x); i++){
 
@@ -79,9 +84,7 @@ public class ShowHandler implements Runnable {
             }
         }
 
-        if (!description.containsKey("class"))
-            description.put("class","data");
-
+        //post-format
         if (!description.containsKey("label"))
             if (description.containsKey("binding")) //1st default label is binding name
                 description.put("label", description.get("binding").toString());
