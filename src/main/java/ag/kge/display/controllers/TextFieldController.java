@@ -1,11 +1,11 @@
 package ag.kge.display.controllers;
 
-import ag.kge.display.KType;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,7 +16,7 @@ public class TextFieldController extends AbstractController {
 
     private final JTextField textField;
 
-    private KType currentType;
+    private boolean isCharArray;
 
     public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
@@ -26,8 +26,9 @@ public class TextFieldController extends AbstractController {
         */
         Object data = template.get("data");
         binding = template.get("binding").toString();
-        currentType = KType.getTypeOf(data);
-        textField = new JTextField(filterData(template.get("data")));
+        if (data instanceof char[]) isCharArray = true;
+
+        textField = new JTextField(filterData(data));
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -41,50 +42,22 @@ public class TextFieldController extends AbstractController {
 
     }
 
-    public JTextField getTextField() {
-        return textField;
-    }
-
-    public void setCurrentType(KType currentType) {
-        this.currentType = currentType;
-    }
-
-    public KType getCurrentType() {
-        return currentType;
-    }
-
     @Override
     public String generateQuery() {
         //variables names are stored using namespace indexing
         String t = textField.getText();
         String[] n = binding.split("\\.");
-        String m;
 
-        //set up amend into variable
-        if (n.length == 1) m = n[0] + ":"; //atom
-        else {
-            //list, use dot indexing, raze names
-            m = ".["+ n[0] + ";raze" ;
-
-            for (int i = 1; i < n.length; i++)
-                m += "`" + n[i];
-
-            m += ";:;"; //add amend operator
-        }
+        String m = generateAmend(n);
 
         /*
-        only time numeric data is reflected on server is when both current type and
-        text field text are numeric
+        numeric data only checked by numfieldcontroller
         */
-        if (currentType == KType.NUMERIC && KType.isNumeric(t))
-            m += t;
-        else {
-            m += "\"" + t + "\""; //set it up as a char array
+        m += "\"" + t + "\""; //set it up as a char array
 
-            //cast to symbol if it's not a char array
-            if (currentType != KType.C_ARRAY)
-                m = "`$" + m;
-        }
+        //cast to symbol if it's not a char array
+        if (!isCharArray)
+            m = "`$" + m;
 
         if (n.length > 1)
             m += "];"; //close dot indexing
@@ -93,15 +66,14 @@ public class TextFieldController extends AbstractController {
         return m;
     }
 
+
     @Override
     public String filterData(Object data) {
-        KType type = KType.getTypeOf(data);
-        if (type == KType.C_ARRAY)
+        if (data instanceof char[])
             return new String((char[]) data);
-        else if (type == KType.STRING ||
-                type == KType.NUMERIC ||
-                type == KType.ATOM
-                )
+        else if (!(data instanceof HashMap) &&
+                !(data instanceof TableModel) &&
+                !(data.getClass().isArray()))
             return data.toString();
         else return "(...)";
     }
@@ -112,31 +84,61 @@ public class TextFieldController extends AbstractController {
 
         //pop off the head of the stack
         Object head = stack.pop();
+
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
-            Object data = stack.pop();
-            //if the data isn't a single character, or the index isn't an int, leave
-            if (!(data instanceof Character) ||
-                    !(head instanceof Integer) ||
-                    (currentType != KType.C_ARRAY))
+
+            //if not currently a char array, return as index into symbol doesn't mean anything
+            if (!isCharArray){
                 return;
+            }
 
-            String current  = textField.getText();
-            int index = (int) head;
-            char charData  = (char) data;
+            Object data = stack.pop();
+            String current = textField.getText();
+            int ind;
+            //if the index is an array and if data is array of chars and lengths are same
+            if (head instanceof int[] &&
+                data instanceof char[] &&
+                Array.getLength(head) == Array.getLength(data)){
 
-            //replaces character, will need testing, not sure this actually works
-            String newText =
-                    current.substring(0,index-1) +
-                    charData + current.substring(index, current.length());
+                for (int i = 0; i < Array.getLength(head);i++){
+                    ind = (int)Array.get(head,i);
+                    current = replaceCharAt(current,ind, (char)Array.get(data,i));
+                }
 
-            textField.setText(newText);
+            } else if (head instanceof Integer && data instanceof Character){
+                //data is a character as needed
+                ind = (int)head;
+                current = replaceCharAt(current,ind,(char)data);
+
+            } else return; //else something wrong with update
+
+            //if problem with update, current stays as is
+            textField.setText(current);
 
         } else { //the head is the complete data
-            currentType = KType.getTypeOf(head);
+
+            if (head instanceof char[]) isCharArray = true;
             textField.setText(filterData(head));
         }
 
+    }
+
+    /**
+     * Replaces character at a given location in a string. Can also append a character.
+     *
+     * @param current
+     * @param index
+     * @param insert
+     * @return
+     */
+    private String replaceCharAt(String current, int index, char insert){
+        if (index <= current.length())
+            return current.substring(0,index-1) +
+                insert + current.substring(index, current.length());
+        else if (index == current.length() + 1){
+            return current + insert;
+        } else return "";
     }
 
 }

@@ -1,9 +1,12 @@
 package ag.kge.display.controllers;
 
-import ag.kge.display.KType;
 import org.junit.*;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 
@@ -18,8 +21,9 @@ public class TextFieldControllerTest {
     private static HashMap<String,Object> numTemplate;
     private static HashMap<String,Object> stringTemplate;
     private static HashMap<String,Object> charTemplate;
-    private static ArrayDeque<Object> atomUpdateStack;
-    private static ArrayDeque<Object> indexedUpdateStack;
+    private static ArrayDeque<Object> atomUpdateStack = new ArrayDeque<>();
+    private static ArrayDeque<Object> indexedUpdateStack = new ArrayDeque<>();
+    private static ArrayDeque<Object> charArrayUpdateStack = new ArrayDeque<>();
 
     @BeforeClass
     public static void setUpNumberTemplate() throws Exception {
@@ -52,11 +56,12 @@ public class TextFieldControllerTest {
     }
 
     @BeforeClass
-    public static void setUpAtomUpdateStack() throws Exception {
+    public static void setUpUpdateStacks() throws Exception {
 
         atomUpdateStack.add("New Update");
-        indexedUpdateStack.add(4);
-        indexedUpdateStack.add("7");
+        charArrayUpdateStack.add("CharArrayUpdate".toCharArray());
+        indexedUpdateStack.add(new int[]{4,8});
+        indexedUpdateStack.add(new char[]{'K', 'L'});
     }
 
     @After
@@ -65,7 +70,7 @@ public class TextFieldControllerTest {
     }
 
     @AfterClass
-    public void tearDownEverything() throws Exception {
+    public static void tearDownEverything() throws Exception {
         stringTemplate = null;
         charTemplate = null;
         numTemplate= null;
@@ -74,7 +79,8 @@ public class TextFieldControllerTest {
     @Test
     public void filterData_valid() throws Exception {
 
-        topController = new TextFieldController(null,null);
+        //tests with strings, char[]'s and numerics
+        topController = new TextFieldController(stringTemplate,null);
 
         assertEquals(topController.filterData("testString"), "testString");
         assertEquals(topController.filterData("testString".toCharArray()), "testString");
@@ -85,70 +91,108 @@ public class TextFieldControllerTest {
     @Test
     public void filterData_invalid() throws Exception {
 
-        topController = new TextFieldController(null,null);
+        topController = new TextFieldController(stringTemplate,null);
         assertEquals(topController.filterData(new double[]{10.0, 45.2, 22.3}), "(...)");
         assertEquals(topController.filterData(new HashMap<String,Object>()),"(...)");
         assertEquals(topController.filterData(new DefaultTableModel()),"(...)");
     }
 
-    @Test
-    public void generateQuery_testIndexingAmend() throws Exception {
 
-        HashMap<String,Object> stringTemplateCopy = new HashMap<>(stringTemplate);
-        stringTemplateCopy.put("binding","value.val");
-        topController = new TextFieldController(stringTemplateCopy,null);
-        assertEquals(topController.generateQuery(),".[`value;`val;:;50];");
+
+    @Test
+    public void replaceCharAt_testWithInsideChar() throws Exception {
+        topController = new TextFieldController(stringTemplate,null);
+        char insert = 'w';
+        int index = 3;
+        String current = "test string";
+
+        Method replaceCharAt = TextFieldController.class.getDeclaredMethod("replaceCharAt",
+                String.class, int.class, char.class);
+        replaceCharAt.setAccessible(true);
+        String result = "";
+        try {
+            result = (String) replaceCharAt.invoke(topController, current,index,insert);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        assertEquals(result, "tewt string");
+
     }
 
     @Test
-    public void generateQuery_testKeepsNumeric() throws Exception {
+    public void replaceCharAt_testWithAppend() throws Exception {
+        topController = new TextFieldController(stringTemplate,null);
+        char insert = 'w';
+        int index = 5;
+        String current = "test";
 
-        topController = new TextFieldController(numTemplate, null);
-        topController.getTextField().setText("45");
-        topController.setCurrentType(KType.NUMERIC);
-        assertEquals(topController.generateQuery(), "value:45;");
+        Method replaceCharAt = TextFieldController.class.getDeclaredMethod("replaceCharAt",
+                String.class, int.class, char.class);
+        replaceCharAt.setAccessible(true);
+        String result = (String) replaceCharAt.invoke(topController, current,index,insert);
+
+        assertEquals(result, "testw");
+
     }
 
     @Test
     public void generateQuery_testKeepsCharArray() throws Exception {
-
         topController = new TextFieldController(charTemplate, null);
-        topController.getTextField().setText("New Char Array");
-        topController.setCurrentType(KType.C_ARRAY);
-        assertEquals(topController.generateQuery(),"value:\"Test Char Array\";");
 
+        Field textField = TextFieldController.class.getDeclaredField("textField");
+        textField.setAccessible(true);
+        ((JTextField)textField.get(topController)).setText("New Char Array");
+
+        assertEquals(topController.generateQuery(), "value:\"New Char Array\";");
     }
 
     @Test
-    public void generateQuery_testCurrentTypeNumToString() throws Exception {
+    public void generateQuery_testKeepsCharArrayWithIndexing() throws Exception {
+        charTemplate.put("binding", "value.name");
+        topController = new TextFieldController(charTemplate, null);
 
-        topController = new TextFieldController(numTemplate,null);
-        topController.getTextField().setText("Some Text");
-        topController.setCurrentType(KType.STRING);
-        assertEquals(topController.generateQuery(),"value:`$\"Some Text\";");
+        Field textField = TextFieldController.class.getDeclaredField("textField");
+        textField.setAccessible(true);
+        ((JTextField)textField.get(topController)).setText("New Char Array");
+
+        assertEquals(topController.generateQuery(),".[`value;raze `name;:;\"New Char Array\"];");
     }
 
     @Test
-    public void generateQuery_testCurrentTypeNumToCharArray() throws Exception {
+    public void update_testStringUpdateStack() throws Exception {
 
-        topController = new TextFieldController(numTemplate,null);
-        topController.getTextField().setText("Some Char Array");
-        topController.setCurrentType(KType.C_ARRAY);
-        assertEquals(topController.generateQuery(),"value:\"Some Char Array\";");
-    }
-
-    @Test
-    public void update_testAtomStackChangesType() throws Exception {
-
-        topController = new TextFieldController(numTemplate,null);
+        topController = new TextFieldController(stringTemplate,null);
         topController.update(null,atomUpdateStack);
-        assertEquals(topController.getCurrentType(), KType.STRING);
+
+        Field textField = TextFieldController.class.getDeclaredField("textField");
+        textField.setAccessible(true);
+
+        assertEquals(((JTextField)textField.get(topController)).getText(),
+                "New Update");
+
     }
 
     @Test
-    public void update_testIndexedStack() throws Exception {
+    public void update_testIsCharArraySet() throws Exception {
+
+        topController = new TextFieldController(stringTemplate,null);
+        topController.update(null,charArrayUpdateStack);
+
+        Field isCharArray = TextFieldController.class.getDeclaredField("isCharArray");
+        isCharArray.setAccessible(true);
+        assertEquals(isCharArray.get(topController), true);
+    }
+
+    @Test
+    public void update_testMultiIndexStack() throws Exception{
         topController = new TextFieldController(charTemplate,null);
         topController.update(null,indexedUpdateStack);
-        assertEquals(topController.getTextField().getText(), "Test7Char Array");
+
+        Field textField = TextFieldController.class.getDeclaredField("textField");
+        textField.setAccessible(true);
+
+        assertEquals(((JTextField)textField.get(topController)).getText(),
+                "TesK ChLr Array");
     }
 }
