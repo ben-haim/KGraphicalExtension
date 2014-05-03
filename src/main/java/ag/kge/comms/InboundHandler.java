@@ -66,6 +66,11 @@ public class InboundHandler implements Runnable{
 
     }
 
+    /**
+     * Main method, opens connection and starts threads
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         int port = 0;
         if (args.length == 1) try{

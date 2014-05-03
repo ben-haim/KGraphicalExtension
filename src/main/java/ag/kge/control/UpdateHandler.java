@@ -67,7 +67,6 @@ public class UpdateHandler implements Runnable {
             //The first string in the name array is always the name of the
             //container object
             name = Array.get(names, 0).toString();
-            updateStack.add(name);
 
             //add the rest of the array to the deque
             for (int i = 1; i < Array.getLength(names); i++){
@@ -75,7 +74,6 @@ public class UpdateHandler implements Runnable {
             }
         } else {
             name = names.toString();
-            updateStack.add(name);
         }
 
         System.out.println(name);

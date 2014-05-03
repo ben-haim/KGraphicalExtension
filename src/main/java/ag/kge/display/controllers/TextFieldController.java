@@ -112,21 +112,12 @@ public class TextFieldController extends AbstractController {
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("Notification Received");
         ArrayDeque stack = (ArrayDeque) arg;
 
         System.out.println("update stack size: " + stack.size());
 
         //pop off the head of the stack
         Object head = stack.pop();
-        System.out.println("Head: " + head.toString());
-
-        if (head.equals(binding)) {
-            head = stack.pop();
-        } else {
-            System.out.println("Not the right data");
-            return;
-        }
 
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
@@ -139,7 +130,7 @@ public class TextFieldController extends AbstractController {
             Object data = stack.pop();
             String current = textField.getText();
             int ind;
-            //if the index is an array and if data is array of chars and lengths are same
+            //if the index and data have a one to one mapping
             if (head instanceof int[] &&
                 data instanceof char[] &&
                 Array.getLength(head) == Array.getLength(data)){
@@ -150,7 +141,8 @@ public class TextFieldController extends AbstractController {
                 }
 
             } else if (head instanceof Integer && data instanceof Character){
-                //data is a character as needed
+
+                //data is a single character as needed
                 ind = (int)head;
                 current = replaceCharAt(current,ind,(char)data);
 

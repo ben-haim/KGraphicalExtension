@@ -27,7 +27,7 @@ public enum ModelCache {
 
 
     /**
-     * Contains the data for the
+     * Contains the model's mapped to their names as
      */
     private final ConcurrentHashMap<String, KDataModel> cache = new ConcurrentHashMap<>();
 
@@ -48,18 +48,6 @@ public enum ModelCache {
     public synchronized boolean checkExists(String name){
         return cache.containsKey(name);
     }
-
-    /**
-     * Checks if some data object is currently maintained on the server, if not a blank
-     * observable is added to the cache.
-     *
-     * Then it queries the server for the data, converts into java's format, before
-     * returning it back to the caller.
-     *
-     * @param modelName
-     * @return
-     */
-
 
     /**
      * Converts complex K data into their native java type, i.e. dictionaries to HashMaps
@@ -87,7 +75,8 @@ public enum ModelCache {
     }
 
     /**
-     * Adds an observer widget controller to the Observable value of the cache.
+     * Checks if some data object is currently maintained on the server, if not a blank observable is added to the
+     * cache. Then adds an observer widget controller to the Observable value of the cache.
      *
      * @param modelName
      * @param observer
@@ -96,14 +85,7 @@ public enum ModelCache {
         if (!cache.containsKey(modelName)){
             cache.put(modelName, new KDataModel());
         }
-        System.out.println("observable name: "+ modelName);
-        System.out.println("observers before: " + cache.get(modelName).countObservers());
-
         cache.get(modelName).addObserver(observer);
-
-        System.out.println("observers after: " + cache.get(modelName).countObservers());
-
-        System.out.println("Finished Adding");
 
     }
 }
