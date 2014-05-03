@@ -23,6 +23,7 @@ public class UpdateHandler implements Runnable {
             parseUpdate(updateQueue.take());
         } catch (InterruptedException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -66,8 +67,7 @@ public class UpdateHandler implements Runnable {
             //The first string in the name array is always the name of the
             //container object
             name = Array.get(names, 0).toString();
-
-            if (!ModelCache.INSTANCE.checkExists(name)) return;
+            updateStack.add(name);
 
             //add the rest of the array to the deque
             for (int i = 1; i < Array.getLength(names); i++){
@@ -75,9 +75,12 @@ public class UpdateHandler implements Runnable {
             }
         } else {
             name = names.toString();
+            updateStack.add(name);
         }
 
+        System.out.println(name);
         //now we can check if the cache contains the data
+        if (!ModelCache.INSTANCE.checkExists(name)) return;
 
         //if it does, put the rest of the indices array on the stack
         for (int i = 0; i < Array.getLength(indices); i++){
@@ -87,6 +90,8 @@ public class UpdateHandler implements Runnable {
         //add the actual data to the bottom of the stack/tail of deque
         //putting it through the parser first
         updateStack.add(ModelCache.INSTANCE.parseData(value));
+
+        ModelCache.INSTANCE.updateModel(name, updateStack);
 
     }
 

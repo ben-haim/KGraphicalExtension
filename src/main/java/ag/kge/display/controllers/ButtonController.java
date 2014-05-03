@@ -1,7 +1,5 @@
 package ag.kge.display.controllers;
 
-import ag.kge.display.KType;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,8 +18,9 @@ public class ButtonController extends AbstractController{
     public ButtonController(HashMap<String,Object> template,
                             final LinkedBlockingQueue<String> outQueue){
 
+        setName(template.get("name").toString());
         button = new JButton(new String((char[]) template.get("label")));
-        cmd = filterData(template.get("data"));
+        cmd = filterData(template.get("binding"));
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -38,13 +37,12 @@ public class ButtonController extends AbstractController{
 
     @Override
     public String filterData(Object data) {
-        if (KType.getTypeOf(data)  == KType.C_ARRAY){
+        if (data instanceof char[]){
             return new String((char[]) data);
         } else return "";
     }
 
     @Override
     public void update(Observable o, Object arg) {
-
     }
 }

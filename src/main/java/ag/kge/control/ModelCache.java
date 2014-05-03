@@ -24,16 +24,12 @@ public enum ModelCache {
      */
     INSTANCE;
 
-    private c conn = null;
+
 
     /**
      * Contains the data for the
      */
-    private final ConcurrentHashMap<String, Observable> cache = new ConcurrentHashMap<>();
-
-    public void setConn(c conn){
-        this.conn = conn;
-    }
+    private final ConcurrentHashMap<String, KDataModel> cache = new ConcurrentHashMap<>();
 
     /**
      * Sends a stack containing update data to the observers of a given variable
@@ -42,9 +38,11 @@ public enum ModelCache {
      * @param updateStack the stack containing the update data
      */
     protected synchronized void updateModel(String name, ArrayDeque<Object> updateStack) {
+        System.out.println("Update called on: " + name);
 
         //call notify observers on the model
-        cache.get(name).notifyObservers(updateStack);
+        System.out.println("obs at update: " + cache.get(name).countObservers());
+        cache.get(name).callUpdate(updateStack);
     }
 
     public synchronized boolean checkExists(String name){
@@ -61,23 +59,7 @@ public enum ModelCache {
      * @param modelName
      * @return
      */
-    public synchronized Object getData(String modelName){
-        if (!cache.containsKey(modelName)){
-            cache.put(modelName, new Observable());
-        }
 
-        Object data;
-        try {
-            data = conn.k(modelName);
-        } catch (IOException | c.KException e) {
-            return null;
-        }
-
-        if (!c.qn(data)){
-            return parseData(data);
-        }
-        return null;
-    }
 
     /**
      * Converts complex K data into their native java type, i.e. dictionaries to HashMaps
@@ -111,9 +93,17 @@ public enum ModelCache {
      * @param observer
      */
     public synchronized void addObserver(String modelName, Observer observer){
+        if (!cache.containsKey(modelName)){
+            cache.put(modelName, new KDataModel());
+        }
+        System.out.println("observable name: "+ modelName);
+        System.out.println("observers before: " + cache.get(modelName).countObservers());
 
-        //this should never be called before the model is added to the cache
-        //..hopefully
         cache.get(modelName).addObserver(observer);
+
+        System.out.println("observers after: " + cache.get(modelName).countObservers());
+
+        System.out.println("Finished Adding");
+
     }
 }

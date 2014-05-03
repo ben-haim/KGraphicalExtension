@@ -13,25 +13,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ShowHandler implements Runnable {
 
     private final LinkedBlockingQueue<Object[]> showQueue;
-    private final LinkedBlockingQueue<String> outQueue;
+    private final LinkedBlockingQueue<HashMap> templateQueue;
 
     public ShowHandler(LinkedBlockingQueue<Object[]> showQueue,
-                       LinkedBlockingQueue<String> outQueue) {
+                       LinkedBlockingQueue<HashMap> templateQueue) {
         this.showQueue = showQueue;
-        this.outQueue = outQueue;
+        this.templateQueue = templateQueue;
     }
 
     @Override
     public void run() {
         while (true) try {
             Object[] message = showQueue.take();
-            FrameCache.INSTANCE.createAndShow(
+            templateQueue.put( //send it to createAndShow after parsing.
                     parseShowMessage(message[0].toString(),
-                            (c.Dict) message[1]),
-                    outQueue
-            );
+                            (c.Dict) message[1]) );
         } catch (InterruptedException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -43,17 +42,19 @@ public class ShowHandler implements Runnable {
      * @param infoDict
      * @return
      */
-    private HashMap<String,Object> parseShowMessage(String name, c.Dict infoDict){
-        HashMap<String, Object> description = new HashMap<>();
-        description.put("name", name);
+    public HashMap<String,Object> parseShowMessage(String name, c.Dict infoDict){
+        HashMap<String, Object> template = new HashMap<>();
+        template.put("name", name);
         int i = 0;
-        if (c.at(infoDict.x,0) == "") i++;
+        if (Array.get(infoDict.x, 0).toString() == "") i=1;
+
         String currentX; Object currentY;
 
         //pre-format
-        description.put("class","data");
-        description.put("width",1);
-        description.put("height",1);
+        template.put("value", new String[]{}); //puts some blank data that can't be displayed by text controllers
+        template.put("class","data"); //sets default class to data
+        template.put("width",1);
+        template.put("height",1);
 
         for (; i < Array.getLength(infoDict.x); i++){
 
@@ -61,37 +62,64 @@ public class ShowHandler implements Runnable {
             currentY = c.at(infoDict.y,i);
 
             switch (currentX){
-                case "c": description.put("class", currentY);
-                case "l": description.put("label", currentY);
+                case "c": template.put("class", currentY);
+                case "l":
+                    if (currentY instanceof String )
+                        template.put("label", currentY);
+                    else if (currentY instanceof char[])
+                        template.put("label", new String((char[])currentY));
+                    else
+                        System.out.println("Error: attribute type (l)");
                     break;
                 case "b":
-                    description.put("binding",currentY);
-                    //also grabs data from model cache
-                    description.put("data",ModelCache.INSTANCE.getData(currentY.toString()));
+                    if (currentY instanceof String) {
+                        template.put("binding", currentY);
+                    } else {
+                        System.out.println("Error: attribute type (b)");
+                    }
                     break;
-                case "w": description.put("width",currentY);
+                case "w":
+                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                        template.put("width",currentY);
+                    else
+                        System.out.println("Error: attribute type (w)");
                     break;
-                case "h": description.put("height", currentY);
+                case "h":
+                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                        template.put("height", currentY);
+                    else
+                        System.out.println("Error: attribute type (h)");
+
                     break;
-                case "x": description.put("x", currentY);
+                case "x":
+                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                        template.put("x", currentY);
+                    else
+                        System.out.println("Error: attribute type (x)");
+
                     break;
-                case "y": description.put("y",currentY);
+                case "y":
+                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                        template.put("y",currentY);
+                    else
+                        System.out.println("Error: attribute type (y)");
+
                     break;
                 //any other attributes can be added later
                 default:
-                    if (currentY instanceof c.Dict) // if it's only some name, ignore it
-                        description.put(currentX, parseShowMessage(currentX,(c.Dict)currentY));
+                    if (currentY instanceof c.Dict) // if it's only some atom, ignore it
+                        template.put(currentX, parseShowMessage(currentX,(c.Dict)currentY));
             }
         }
 
         //post-format
-        if (!description.containsKey("label"))
-            if (description.containsKey("binding")) //1st default label is binding name
-                description.put("label", description.get("binding").toString());
+        if (!template.containsKey("label"))
+            if (template.containsKey("binding")) //1st default label is binding name
+                template.put("label", template.get("binding").toString());
             else  //2nd default label is widget name
-                description.put("label", name);
+                template.put("label", name);
 
-        return description;
+        return template;
     }
 
 

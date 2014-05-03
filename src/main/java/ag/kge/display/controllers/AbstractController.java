@@ -34,7 +34,7 @@ public abstract class AbstractController extends JPanel implements Observer{
 
     }
 
-    protected boolean isNumeric(Object object){
+    public static boolean isNumeric(Object object){
         try {
             Double.parseDouble(object.toString());
             return true;

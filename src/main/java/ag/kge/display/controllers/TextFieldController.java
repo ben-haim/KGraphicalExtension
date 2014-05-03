@@ -14,9 +14,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TextFieldController extends AbstractController {
 
-    private final JTextField textField;
+    private JTextField textField;
 
     private boolean isCharArray;
+    private boolean isNumber;
 
     public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
@@ -25,10 +26,11 @@ public class TextFieldController extends AbstractController {
         the component with a get() call
         */
         Object data = template.get("data");
+
         binding = template.get("binding").toString();
         if (data instanceof char[]) isCharArray = true;
 
-        textField = new JTextField(filterData(data));
+        textField = new JTextField(10);
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -36,14 +38,19 @@ public class TextFieldController extends AbstractController {
             }
         });
         setName(template.get("name").toString());
-        //label's should be a char array
-        setBorder(new TitledBorder(new String((char[]) template.get("label"))));
+        System.out.println("widget name: " +getName());
+
+        setBorder(new TitledBorder(template.get("label").toString()));
         add(textField);
 
     }
 
     @Override
     public String generateQuery() {
+
+        if (isNumber)
+            return generateNumericQuery();
+
         //variables names are stored using namespace indexing
         String t = textField.getText();
         String[] n = binding.split("\\.");
@@ -66,10 +73,35 @@ public class TextFieldController extends AbstractController {
         return m;
     }
 
+    /**
+     * Generates the amend if the current data is a number, throwing an error if non numeric
+     * data in text field.
+     *
+     * @return generated query String
+     */
+    private String generateNumericQuery() {
+        String t = textField.getText();
+        String n[] = binding.split("\\.");
+        String m = generateAmend(n);
+
+        if (isNumeric(t)){
+            m += t;
+        } else {
+            textField.setText("ERROR: NOT A NUMBER");
+            return "";
+        }
+
+        if (n.length > 1)
+            m += "];"; //close dot indexing
+        else m+=";"; //otherwise just close statement
+
+        return m;
+    }
+
 
     @Override
     public String filterData(Object data) {
-        if (data instanceof char[])
+        if (data instanceof char[])//takes char array
             return new String((char[]) data);
         else if (!(data instanceof HashMap) &&
                 !(data instanceof TableModel) &&
@@ -80,14 +112,25 @@ public class TextFieldController extends AbstractController {
 
     @Override
     public void update(Observable o, Object arg) {
-        ArrayDeque<Object> stack = (ArrayDeque) arg;
+        System.out.println("Notification Received");
+        ArrayDeque stack = (ArrayDeque) arg;
+
+        System.out.println("update stack size: " + stack.size());
 
         //pop off the head of the stack
         Object head = stack.pop();
+        System.out.println("Head: " + head.toString());
+
+        if (head.equals(binding)) {
+            head = stack.pop();
+        } else {
+            System.out.println("Not the right data");
+            return;
+        }
 
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
-
+            System.out.println("Stack is not empty");
             //if not currently a char array, return as index into symbol doesn't mean anything
             if (!isCharArray){
                 return;
@@ -117,11 +160,14 @@ public class TextFieldController extends AbstractController {
             textField.setText(current);
 
         } else { //the head is the complete data
-
+            System.out.println("Stack is empty");
             if (head instanceof char[]) isCharArray = true;
+            if (isNumeric(head)) {
+                isNumber = true;
+                System.out.println("Is Number");
+            }
             textField.setText(filterData(head));
         }
-
     }
 
     /**
