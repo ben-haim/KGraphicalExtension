@@ -16,19 +16,12 @@ public class TextFieldController extends AbstractController {
 
     private JTextField textField;
 
-    private boolean isCharArray;
-    private boolean isNumber;
+    private boolean isCharArray = false;
+    private boolean isNumber = false;
 
     public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
-        /*
-        At this point the data should also be in the infoDict so we can initialise
-        the component with a get() call
-        */
-        Object data = template.get("data");
-
         binding = template.get("binding").toString();
-        if (data instanceof char[]) isCharArray = true;
 
         textField = new JTextField(10);
         textField.addActionListener(new ActionListener() {
@@ -60,12 +53,13 @@ public class TextFieldController extends AbstractController {
         /*
         numeric data only checked by numfieldcontroller
         */
-        m += "\"" + t + "\""; //set it up as a char array
+        String v = "\"" + t + "\""; //set it up as a char array
 
         //cast to symbol if it's not a char array
         if (!isCharArray)
-            m = "`$" + m;
+            v = "`$" + v;
 
+        m+= v;
         if (n.length > 1)
             m += "];"; //close dot indexing
         else m+=";"; //otherwise just close statement
@@ -113,15 +107,11 @@ public class TextFieldController extends AbstractController {
     @Override
     public void update(Observable o, Object arg) {
         ArrayDeque stack = (ArrayDeque) arg;
-
-        System.out.println("update stack size: " + stack.size());
-
         //pop off the head of the stack
         Object head = stack.pop();
 
         //if the stack isn't empty, the head is an index
         if (!stack.isEmpty()){
-            System.out.println("Stack is not empty");
             //if not currently a char array, return as index into symbol doesn't mean anything
             if (!isCharArray){
                 return;
@@ -152,11 +142,9 @@ public class TextFieldController extends AbstractController {
             textField.setText(current);
 
         } else { //the head is the complete data
-            System.out.println("Stack is empty");
             if (head instanceof char[]) isCharArray = true;
             if (isNumeric(head)) {
                 isNumber = true;
-                System.out.println("Is Number");
             }
             textField.setText(filterData(head));
         }
