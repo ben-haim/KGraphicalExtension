@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Observable;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -15,7 +16,7 @@ public class ButtonController extends AbstractController{
     private final JButton button;
     private final String cmd;
 
-    public ButtonController(HashMap<String,Object> template,
+    public ButtonController(TreeMap<String,Object> template,
                             final LinkedBlockingQueue<String> outQueue){
 
         setName(template.get("name").toString());

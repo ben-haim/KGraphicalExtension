@@ -18,7 +18,8 @@ public class PanelController extends AbstractController {
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final LinkedBlockingQueue<String> outQueue;
     private final boolean hasDataBinding;
-    public PanelController(HashMap<String, Object> template,
+
+    public PanelController(TreeMap<String, Object> template,
                            LinkedBlockingQueue<String> outQueue){
 
         this.outQueue = outQueue;
@@ -31,6 +32,7 @@ public class PanelController extends AbstractController {
         else {
             ModelCache.INSTANCE.addObserver(this.binding = template.get("binding").toString(),this);
             outQueue.add("gUpdate[`"+binding+"; ()]");
+            System.out.println("gUpdate[`"+binding+"; ()]");
         }
     }
 
@@ -40,8 +42,8 @@ public class PanelController extends AbstractController {
      * @param variable
      * @return
      */
-    private HashMap<String, Object> createDefaultTemplate(String variable){
-        HashMap<String, Object> template = new HashMap<>();
+    private TreeMap<String, Object> createDefaultTemplate(String variable){
+        TreeMap<String, Object> template = new TreeMap<>();
 
         template.put("name", variable);
         template.put("label",variable);
@@ -56,14 +58,14 @@ public class PanelController extends AbstractController {
      * Places widgets as determined by their positioning after selecting their controller
      * @param template
      */
-    private void addChildrenToPanel(HashMap<String,Object> template){
+    private void addChildrenToPanel(TreeMap<String,Object> template){
 
         int maxY = 1;
         AbstractController widget;
         String currentB;
         for (Object x: template.values())
-            if (x instanceof HashMap) {
-                HashMap<String,Object> h = (HashMap<String, Object>) x;
+            if (x instanceof TreeMap) {
+                TreeMap<String,Object> h = (TreeMap<String, Object>) x;
 
                 gbc.gridwidth = (Integer) h.get("width");
                 gbc.gridheight = (Integer) h.get("height");
@@ -89,7 +91,6 @@ public class PanelController extends AbstractController {
                         outQueue.add("gUpdate[`" + currentB + "; ()]");
                     }
                 }
-
                 add(widget, gbc);
             }
     }
@@ -100,7 +101,7 @@ public class PanelController extends AbstractController {
      * @param template
      * @return
      */
-    private AbstractController selectController(HashMap<String,Object> template) {
+    private AbstractController selectController(TreeMap<String,Object> template) {
 
         switch (template.get("class").toString()){
             case "data":
@@ -126,7 +127,7 @@ public class PanelController extends AbstractController {
     @Override
     public Boolean filterData(Object data) {
 
-        HashMap d = (HashMap) data;
+        TreeMap d = (TreeMap) data;
         if (d.containsKey("binding")){
             return true;
         } else {
@@ -140,13 +141,12 @@ public class PanelController extends AbstractController {
 
         ArrayList updateList = (ArrayList) arg;
         Object head = updateList.get(0);
-        HashMap templateData;
-
-        if (head instanceof HashMap){
+        TreeMap templateData;
+        if (head instanceof TreeMap){
             //whole dictionary given?
 
-            HashMap<String, Object> createMap = new HashMap<>();
-            templateData = (HashMap) head;
+            TreeMap<String, Object> createMap = new TreeMap<>();
+            templateData = (TreeMap) head;
 
             for (Object x: templateData.keySet()){
                 createMap.put(x.toString(), createDefaultTemplate(x.toString()));
@@ -163,9 +163,12 @@ public class PanelController extends AbstractController {
 
         } else {
             //the head is a symbol of the name of the child to be udpate
+            System.out.println("Panel Update Received");
+
             String childName = head.toString();
             List newList = updateList.subList(1, updateList.size());
             for (AbstractController x: children){
+                System.out.println(x.getName());
                 if (x.getName().equals(childName)){
                     x.update(null,newList);
                 }

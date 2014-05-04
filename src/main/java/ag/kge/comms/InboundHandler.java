@@ -5,7 +5,9 @@ import ag.kge.control.*;
 import ag.kge.display.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -41,11 +43,16 @@ public class InboundHandler implements Runnable{
     }
 
     private void readMessage(Object msg){
-        if (!msg.getClass().isArray())
+
+        if (!msg.getClass().isArray()){
+            System.out.println(msg.toString());
             return;
+        }
+
+        System.out.println("Message Received");
 
         Object[] message = (Object[]) msg;
-
+        System.out.println(Arrays.asList(message));
         String cmd = message[0].toString();
 
         switch (cmd){
@@ -98,7 +105,7 @@ public class InboundHandler implements Runnable{
         final LinkedBlockingQueue<String> outQueue = new LinkedBlockingQueue<>();
         final LinkedBlockingQueue<Object[]> showQueue = new LinkedBlockingQueue<>();
         final LinkedBlockingQueue<Object[]> updateQueue = new LinkedBlockingQueue<>();
-        final LinkedBlockingQueue<HashMap> templateQueue = new LinkedBlockingQueue<>();
+        final LinkedBlockingQueue<TreeMap> templateQueue = new LinkedBlockingQueue<>();
 
 
         //communication layer threads

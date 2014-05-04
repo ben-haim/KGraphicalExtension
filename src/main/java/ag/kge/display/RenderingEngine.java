@@ -10,6 +10,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -18,13 +19,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class RenderingEngine implements Runnable {
 
     private final LinkedBlockingQueue<String> outQueue;
-    private final LinkedBlockingQueue<HashMap> templateQueue;
+    private final LinkedBlockingQueue<TreeMap> templateQueue;
     private final List<String> possibleAttributes = Arrays.asList(
             "class","label","binding", "width", "height", "x", "y", "name");
 
 
     public RenderingEngine(LinkedBlockingQueue<String> outQueue,
-                           LinkedBlockingQueue<HashMap> templateQueue) {
+                           LinkedBlockingQueue<TreeMap> templateQueue) {
         this.outQueue = outQueue;
         this.templateQueue = templateQueue;
     }
@@ -40,7 +41,7 @@ public class RenderingEngine implements Runnable {
     }
 
 
-    private void createAndShow(HashMap<String,Object> template) {
+    private void createAndShow(TreeMap<String,Object> template) {
 
         JFrame frame = new JFrame(template.get("label").toString());
         frame.setContentPane(createControllerHierarchy(template));
@@ -57,7 +58,7 @@ public class RenderingEngine implements Runnable {
      *
      * @param template
      */
-    private JPanel createControllerHierarchy(HashMap<String,Object> template){
+    private JPanel createControllerHierarchy(TreeMap<String,Object> template){
 
         AbstractController c;
         String binding;
@@ -80,12 +81,12 @@ public class RenderingEngine implements Runnable {
             JPanel topPanel = new JPanel();
             topPanel.setLayout(new BoxLayout(topPanel,BoxLayout.Y_AXIS));
 
-            HashMap h;
+            TreeMap h;
             for (String x: template.keySet()) {
                 if (!possibleAttributes.contains(x) && //if the value isn't an attribute
                         template.get(x) instanceof HashMap) { //and it's a dictionary
                     //then it must be a child widget
-                    h = (HashMap) template.get(x);
+                    h = (TreeMap) template.get(x);
                     topPanel.add(createControllerHierarchy(h));
                 }
             }

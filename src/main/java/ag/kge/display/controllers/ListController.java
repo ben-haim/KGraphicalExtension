@@ -10,6 +10,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -21,13 +22,13 @@ public class ListController extends AbstractController implements ListDataListen
     private final DefaultListModel<Object> model;
     private int lastChangedIndex = 0;
     private final String label;
-    public ListController(HashMap<String, Object> tempalate, LinkedBlockingQueue<String> outQueue) {
+    public ListController(TreeMap<String, Object> template, LinkedBlockingQueue<String> outQueue) {
         this.outQueue = outQueue;
         model = new DefaultListModel<>();
         JList<Object> list = new JList<>(model);
-        setName(tempalate.get("name").toString());
-        binding = tempalate.get("binding").toString();
-        label = tempalate.get("label").toString();
+        setName(template.get("name").toString());
+        binding = template.get("binding").toString();
+        label = template.get("label").toString();
         model.addListDataListener(this);
         JScrollPane pane = new JScrollPane(list);
         pane.setPreferredSize(new Dimension(75, 150));
@@ -69,7 +70,7 @@ public class ListController extends AbstractController implements ListDataListen
     public String filterData(Object data) {
         if (data instanceof char[])//takes char array
             return new String((char[]) data);
-        else if (!(data instanceof HashMap) &&
+        else if (!(data instanceof TreeMap) &&
                 !(data instanceof TableModel) &&
                 !(data.getClass().isArray()))
             return data.toString();

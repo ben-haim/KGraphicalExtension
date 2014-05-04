@@ -19,7 +19,7 @@ public class TextFieldController extends AbstractController {
     private boolean isCharArray = false;
     private boolean isNumber = false;
 
-    public TextFieldController(HashMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
+    public TextFieldController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
         binding = template.get("binding").toString();
 

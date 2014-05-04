@@ -3,8 +3,8 @@ package ag.kge.control;
 import ag.kge.c;
 
 import java.lang.reflect.Array;
-import java.util.HashMap;
 
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -13,10 +13,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ShowHandler implements Runnable {
 
     private final LinkedBlockingQueue<Object[]> showQueue;
-    private final LinkedBlockingQueue<HashMap> templateQueue;
+    private final LinkedBlockingQueue<TreeMap> templateQueue;
 
     public ShowHandler(LinkedBlockingQueue<Object[]> showQueue,
-                       LinkedBlockingQueue<HashMap> templateQueue) {
+                       LinkedBlockingQueue<TreeMap> templateQueue) {
         this.showQueue = showQueue;
         this.templateQueue = templateQueue;
     }
@@ -43,8 +43,8 @@ public class ShowHandler implements Runnable {
      * @param infoDict
      * @return
      */
-    public HashMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
-        HashMap<String, Object> template = new HashMap<>();
+    public TreeMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
+        TreeMap<String, Object> template = new TreeMap<>();
         template.put("name", name);
         int i = 0;
         if (Array.get(infoDict.x, 0).toString().equals("")) i = 1;

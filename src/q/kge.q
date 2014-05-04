@@ -5,6 +5,7 @@ gUpdate: {[v;i]
 		value v; //use the whole variable
 		.[value v; i]; //use the indexed variable
 		];
+	show s;
 	(neg .g.h) (`update; v; i; s)}; //send update async
 
 gShow: {[gui]
