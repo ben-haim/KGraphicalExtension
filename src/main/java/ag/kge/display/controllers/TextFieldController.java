@@ -151,7 +151,9 @@ public class TextFieldController extends AbstractController {
             if (isNumeric(head)) {
                 isNumber = true;
             }
-            textField.setText(filterData(head));
+            String out = filterData(head);
+            textField.setText(out);
+            textField.setColumns(out.length());
         }
     }
 
