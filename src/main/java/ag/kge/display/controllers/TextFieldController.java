@@ -31,7 +31,7 @@ public class TextFieldController extends AbstractController {
             }
         });
         setName(template.get("name").toString());
-        System.out.println("widget name: " +getName());
+
 
         setBorder(new TitledBorder(template.get("label").toString()));
         add(textField);
