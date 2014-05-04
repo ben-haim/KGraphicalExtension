@@ -20,17 +20,17 @@ public class ListController extends AbstractController implements ListDataListen
     private final LinkedBlockingQueue<String> outQueue;
     private final DefaultListModel<Object> model;
     private int lastChangedIndex = 0;
-
+    private final String label;
     public ListController(HashMap<String, Object> tempalate, LinkedBlockingQueue<String> outQueue) {
         this.outQueue = outQueue;
         model = new DefaultListModel<>();
         JList<Object> list = new JList<>(model);
         setName(tempalate.get("name").toString());
         binding = tempalate.get("binding").toString();
-        setBorder(new TitledBorder(tempalate.get("label").toString() + ":" + model.getSize()));
+        label = tempalate.get("label").toString();
         model.addListDataListener(this);
-        list.setMinimumSize(new Dimension(75, 150));
         JScrollPane pane = new JScrollPane(list);
+        pane.setPreferredSize(new Dimension(75, 150));
         add(pane);
     }
 
@@ -111,6 +111,8 @@ public class ListController extends AbstractController implements ListDataListen
 
             }
         }
+
+        setBorder(new TitledBorder(label + ":" + model.getSize()));
 
 
     }

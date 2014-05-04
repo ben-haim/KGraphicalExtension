@@ -2,7 +2,7 @@ system("p 5000"); //set the port to 5000
 
 a:`$"hello world";
 b: 10;
-c: "chararray"
+c: "b+:5"
 d: `a`b`c! 10 20 30;
 e: `a`b`c`d;
 v: 11 12 13 14 15;
@@ -25,14 +25,20 @@ gui3.wB.x: 1i;
 gui3.wB.b: `b;
 gui3.wC.y: 1i;
 gui3.wC.w: 2i;
-gui3.wC.b: `c;
+gui3.wC.b: c;
+gui3.wC.c: `button;
+gui3.wC.l: "Increment b";
+
 gui3.wE.y: 2i;
 gui3.wE.h: 2i;
 gui3.wE.b: `e;
+gui3.wE.c: `list;
+
 gui3.wV.b: `v;
 gui3.wV.h: 2i;
 gui3.wV.x: 1i;
 gui3.wV.y: 2i;
+gui3.wV.c: `list;
 gui3.l:"Super GUI";
 gui3.c:`panel;
 

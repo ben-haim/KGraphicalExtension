@@ -153,7 +153,7 @@ public class TextFieldController extends AbstractController {
             }
             String out = filterData(head);
             textField.setText(out);
-            textField.setColumns(out.length());
+            textField.setColumns(out.length()+2);
         }
     }
 
