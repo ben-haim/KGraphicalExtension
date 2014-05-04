@@ -106,18 +106,21 @@ public class TextFieldController extends AbstractController {
 
     @Override
     public void update(Observable o, Object arg) {
-        ArrayDeque stack = (ArrayDeque) arg;
+        int pointer = 0;
+        ArrayList updateList = (ArrayList) arg;
         //pop off the head of the stack
-        Object head = stack.pop();
+        System.out.println(getName() + " stack " + updateList.size());
+        Object head = updateList.get(pointer);
+        pointer++;
 
         //if the stack isn't empty, the head is an index
-        if (!stack.isEmpty()){
+        if (!(updateList.size() == 1)){
             //if not currently a char array, return as index into symbol doesn't mean anything
             if (!isCharArray){
                 return;
             }
 
-            Object data = stack.pop();
+            Object data = updateList.get(pointer);
             String current = textField.getText();
             int ind;
             //if the index and data have a one to one mapping

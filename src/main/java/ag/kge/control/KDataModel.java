@@ -1,6 +1,6 @@
 package ag.kge.control;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Observable;
 
 /**
@@ -8,9 +8,10 @@ import java.util.Observable;
  */
 public class KDataModel extends Observable {
 
-    public void callUpdate(ArrayDeque updateStack){
+    public void callUpdate(ArrayList updateList){
         setChanged();
-        notifyObservers(updateStack);
+
+        notifyObservers(updateList);
     }
 
 }

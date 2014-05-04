@@ -4,6 +4,7 @@ import ag.kge.c;
 
 import java.lang.reflect.Array;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -54,7 +55,7 @@ public class UpdateHandler implements Runnable {
         The popped value could be an index, in which case the widget should try
         to call the update method on the child widget with the index
         */
-        ArrayDeque<Object> updateStack = new ArrayDeque<>();
+        ArrayList<Object> updateStack = new ArrayList<>();
 
         /*
         The name that comes on the update message may be an array of strings.

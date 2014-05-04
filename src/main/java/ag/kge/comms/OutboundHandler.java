@@ -27,6 +27,7 @@ public class OutboundHandler implements Runnable {
 
         while (true) try  {
             String out = outQueue.take();
+            Thread.sleep(10);
             conn.ks(out);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

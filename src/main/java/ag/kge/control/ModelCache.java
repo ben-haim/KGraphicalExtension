@@ -4,10 +4,7 @@ import ag.kge.c;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,11 +34,11 @@ public enum ModelCache {
      * @param name the name of the variable
      * @param updateStack the stack containing the update data
      */
-    protected synchronized void updateModel(String name, ArrayDeque<Object> updateStack) {
+    protected synchronized void updateModel(String name, ArrayList updateStack) {
         System.out.println("Update called on: " + name);
 
         //call notify observers on the model
-        System.out.println("obs at update: " + cache.get(name).countObservers());
+        System.out.println("Obs at update: " + cache.get(name).countObservers());
         cache.get(name).callUpdate(updateStack);
     }
 
@@ -85,7 +82,8 @@ public enum ModelCache {
         if (!cache.containsKey(modelName)){
             cache.put(modelName, new KDataModel());
         }
-        cache.get(modelName).addObserver(observer);
 
+        System.out.println("Adding Observer to " + modelName);
+        cache.get(modelName).addObserver(observer);
     }
 }
