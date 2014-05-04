@@ -27,7 +27,8 @@ public class ShowHandler implements Runnable {
             Object[] message = showQueue.take();
             templateQueue.put( //send it to createAndShow after parsing.
                     parseShowMessage(message[0].toString(),
-                            (c.Dict) message[1]) );
+                            (c.Dict) message[1])
+            );
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.exit(1);
@@ -42,32 +43,35 @@ public class ShowHandler implements Runnable {
      * @param infoDict
      * @return
      */
-    public HashMap<String,Object> parseShowMessage(String name, c.Dict infoDict){
+    public HashMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
         HashMap<String, Object> template = new HashMap<>();
         template.put("name", name);
         int i = 0;
-        if (Array.get(infoDict.x, 0).toString() == "") i=1;
+        if (Array.get(infoDict.x, 0).toString().equals("")) i = 1;
 
-        String currentX; Object currentY;
+        String currentX;
+        Object currentY;
 
         //pre-format
         template.put("value", new String[]{}); //puts some blank data that can't be displayed by text controllers
-        template.put("class","data"); //sets default class to data
-        template.put("width",1);
-        template.put("height",1);
+        template.put("class", "data"); //sets default class to data
+        template.put("width", 1);
+        template.put("height", 1);
 
-        for (; i < Array.getLength(infoDict.x); i++){
+        for (; i < Array.getLength(infoDict.x); i++) {
 
-            currentX = c.at(infoDict.x,i).toString();
-            currentY = c.at(infoDict.y,i);
+            currentX = c.at(infoDict.x, i).toString();
+            currentY = c.at(infoDict.y, i);
 
-            switch (currentX){
-                case "c": template.put("class", currentY);
+            switch (currentX) {
+                case "c":
+                    template.put("class", currentY);
+                    break;
                 case "l":
-                    if (currentY instanceof String )
+                    if (currentY instanceof String)
                         template.put("label", currentY);
                     else if (currentY instanceof char[])
-                        template.put("label", new String((char[])currentY));
+                        template.put("label", new String((char[]) currentY));
                     else
                         System.out.println("Error: attribute type (l)");
                     break;
@@ -80,7 +84,7 @@ public class ShowHandler implements Runnable {
                     break;
                 case "w":
                     if ((currentY instanceof Integer) || (currentY instanceof Long))
-                        template.put("width",currentY);
+                        template.put("width", currentY);
                     else
                         System.out.println("Error: attribute type (w)");
                     break;
@@ -100,7 +104,7 @@ public class ShowHandler implements Runnable {
                     break;
                 case "y":
                     if ((currentY instanceof Integer) || (currentY instanceof Long))
-                        template.put("y",currentY);
+                        template.put("y", currentY);
                     else
                         System.out.println("Error: attribute type (y)");
 
@@ -108,7 +112,7 @@ public class ShowHandler implements Runnable {
                 //any other attributes can be added later
                 default:
                     if (currentY instanceof c.Dict) // if it's only some atom, ignore it
-                        template.put(currentX, parseShowMessage(currentX,(c.Dict)currentY));
+                        template.put(currentX, parseShowMessage(currentX, (c.Dict) currentY));
             }
         }
 
@@ -119,9 +123,9 @@ public class ShowHandler implements Runnable {
             else  //2nd default label is widget name
                 template.put("label", name);
 
+
         return template;
     }
-
-
-
 }
+
+

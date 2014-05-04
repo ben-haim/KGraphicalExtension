@@ -85,10 +85,12 @@ public class TextFieldController extends AbstractController {
             return "";
         }
 
-        if (n.length > 1)
+        if (n.length > 1) {
+            System.out.println("Uses Dot Indexing");
             m += "];"; //close dot indexing
+        }
         else m+=";"; //otherwise just close statement
-
+        System.out.println(m);
         return m;
     }
 
@@ -107,7 +109,7 @@ public class TextFieldController extends AbstractController {
     @Override
     public void update(Observable o, Object arg) {
         int pointer = 0;
-        ArrayList updateList = (ArrayList) arg;
+        List updateList = (List) arg;
         //pop off the head of the stack
         System.out.println(getName() + " stack " + updateList.size());
         Object head = updateList.get(pointer);

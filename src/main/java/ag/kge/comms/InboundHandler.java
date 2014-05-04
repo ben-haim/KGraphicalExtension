@@ -41,25 +41,24 @@ public class InboundHandler implements Runnable{
     }
 
     private void readMessage(Object msg){
+        if (!msg.getClass().isArray())
+            return;
+
         Object[] message = (Object[]) msg;
 
         String cmd = message[0].toString();
 
         switch (cmd){
             case "show":
-                System.out.println("show");
                 showQueue.add(new Object[]{message[1], message[2]});
                 break;
             case "hide":
-                System.out.println("hide");
                 FrameCache.INSTANCE.hideFrame(message[1].toString());
                 break;
             case "update":
-                System.out.println("update");
                 updateQueue.add(new Object[]{message[1], message[2], message[3]});
                 break;
             case "kill":
-                System.out.println("kill");
                 System.exit(0);
         }
 

@@ -5,10 +5,8 @@ import ag.kge.control.ModelCache;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Observable;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -20,34 +18,34 @@ public class PanelController extends AbstractController {
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final LinkedBlockingQueue<String> outQueue;
     private final boolean hasDataBinding;
-    private final JScrollPane scrollPane;
-
     public PanelController(HashMap<String, Object> template,
                            LinkedBlockingQueue<String> outQueue){
 
         this.outQueue = outQueue;
         hasDataBinding = filterData(template);
         setMinimumSize(new Dimension(75,150));
-        scrollPane = new JScrollPane();
-        this.setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());
         setName(template.get("name").toString());
         if (!hasDataBinding)
             addChildrenToPanel(template);
-
+        else {
+            ModelCache.INSTANCE.addObserver(this.binding = template.get("binding").toString(),this);
+            outQueue.add("gUpdate[`"+binding+"; ()]");
+        }
     }
 
     /**
      * Creates a default barebones template required by the controllers for each value in the dictionary.
      * Vector-value dictionaries should just have single types.
-     * @param name
+     * @param variable
      * @return
      */
-    private HashMap<String, Object> createDefaultTemplate(String name){
+    private HashMap<String, Object> createDefaultTemplate(String variable){
         HashMap<String, Object> template = new HashMap<>();
 
-        template.put("name", name);
-        template.put("binding",getName()+ "." +name);
-        template.put("label",name);
+        template.put("name", variable);
+        template.put("label",variable);
+        template.put("binding",this.binding + "." +variable);
         template.put("class", "data");
         template.put("width", 1);
         template.put("height", 1);
@@ -62,7 +60,7 @@ public class PanelController extends AbstractController {
 
         int maxY = 1;
         AbstractController widget;
-        String binding;
+        String currentB;
         for (Object x: template.values())
             if (x instanceof HashMap) {
                 HashMap<String,Object> h = (HashMap<String, Object>) x;
@@ -85,12 +83,12 @@ public class PanelController extends AbstractController {
 
                 children.add(widget = selectController(h));
 
-                if (h.containsKey("binding")){
-                    ModelCache.INSTANCE.addObserver(binding = h.get("binding").toString(), widget);
-                    outQueue.add("gUpdate[`"+binding+"; ()]");
+                if (!hasDataBinding){
+                    ModelCache.INSTANCE.addObserver(currentB = h.get("binding").toString(), widget);
+                    outQueue.add("gUpdate[`"+currentB+"; ()]");
                 }
 
-                scrollPane.add(widget,gbc);
+                add(widget, gbc);
             }
     }
 
@@ -127,7 +125,6 @@ public class PanelController extends AbstractController {
 
         HashMap d = (HashMap) data;
         if (d.containsKey("binding")){
-            //can't put anything but a hashmap in a panel
             return true;
         } else {
             return false;
@@ -138,11 +135,11 @@ public class PanelController extends AbstractController {
     @Override
     public void update(Observable o, Object arg) {
 
-        ArrayDeque updateStack = (ArrayDeque) arg;
-        Object head;
+        ArrayList updateList = (ArrayList) arg;
+        Object head = updateList.get(0);
         HashMap templateData;
 
-        if ((head = updateStack.pop()) instanceof HashMap){
+        if (head instanceof HashMap){
             //whole dictionary given?
 
             HashMap<String, Object> createMap = new HashMap<>();
@@ -151,15 +148,23 @@ public class PanelController extends AbstractController {
             for (Object x: templateData.keySet()){
                 createMap.put(x.toString(), createDefaultTemplate(x.toString()));
             }
-
             addChildrenToPanel(createMap);
+
+            for (Object x: templateData.keySet()){
+                for (AbstractController c: children){
+                    if (x.toString().equals(c.getName())){
+                        c.update(null, Arrays.asList(templateData.get(x)));
+                    }
+                }
+            }
+
         } else {
             //the head is a symbol of the name of the child to be udpate
             String childName = head.toString();
+            List newList = updateList.subList(1, updateList.size());
             for (AbstractController x: children){
-
                 if (x.getName().equals(childName)){
-                    x.update(null,updateStack);
+                    x.update(null,newList);
                 }
 
             }
