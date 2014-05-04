@@ -80,7 +80,9 @@ public class ShowHandler implements Runnable {
                 case "b":
                     if (currentY instanceof String) {
                         template.put("binding", currentY);
-                    } else {
+                    } else if (currentY instanceof char[]) {
+                        template.put("binding", new String((char[]) currentY));
+                    }else{
                         System.out.println("Error: attribute type (b)");
                     }
                     break;

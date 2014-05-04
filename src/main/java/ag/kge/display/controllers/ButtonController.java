@@ -19,7 +19,7 @@ public class ButtonController extends AbstractController{
                             final LinkedBlockingQueue<String> outQueue){
 
         setName(template.get("name").toString());
-        button = new JButton(new String((char[]) template.get("label")));
+        button = new JButton(template.get("label").toString());
         cmd = filterData(template.get("binding"));
         button.addActionListener(new ActionListener() {
             @Override
@@ -37,8 +37,8 @@ public class ButtonController extends AbstractController{
 
     @Override
     public String filterData(Object data) {
-        if (data instanceof char[]){
-            return new String((char[]) data);
+        if (data instanceof String){
+            return data.toString();
         } else return "";
     }
 

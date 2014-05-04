@@ -84,8 +84,10 @@ public class PanelController extends AbstractController {
                 children.add(widget = selectController(h));
 
                 if (!hasDataBinding){
-                    ModelCache.INSTANCE.addObserver(currentB = h.get("binding").toString(), widget);
-                    outQueue.add("gUpdate[`"+currentB+"; ()]");
+                    if (!(widget instanceof ButtonController)) {
+                        ModelCache.INSTANCE.addObserver(currentB = h.get("binding").toString(), widget);
+                        outQueue.add("gUpdate[`" + currentB + "; ()]");
+                    }
                 }
 
                 add(widget, gbc);
@@ -109,6 +111,7 @@ public class PanelController extends AbstractController {
                 AbstractController c =  new PanelController(template,outQueue);
                 c.setBorder(new TitledBorder(template.get("label").toString()));
                 return c;
+            case "list": return new ListController(template,outQueue);
         }
 
         return null;
