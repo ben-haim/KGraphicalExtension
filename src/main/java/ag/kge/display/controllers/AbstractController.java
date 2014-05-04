@@ -42,20 +42,4 @@ public abstract class AbstractController extends JPanel implements Observer{
             return false;
         }
     }
-
-    @Override
-    public boolean equals(Object c){
-
-        if (!(c instanceof AbstractController))
-            return false;
-
-        AbstractController ac = (AbstractController)c;
-
-        if (ac.getName() == getName() &&
-                ac.binding == binding)
-            return true;
-        else
-            return false;
-    }
-
 }

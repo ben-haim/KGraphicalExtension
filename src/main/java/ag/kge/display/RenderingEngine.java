@@ -43,9 +43,7 @@ public class RenderingEngine implements Runnable {
     private void createAndShow(HashMap<String,Object> template) {
 
         JFrame frame = new JFrame(template.get("label").toString());
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.add(createControllerHierarchy(template));
-        frame.setContentPane(scrollPane);
+        frame.setContentPane(createControllerHierarchy(template));
         frame.pack();
         frame.setLocationRelativeTo(null);
         FrameCache.INSTANCE.addFrame(template.get("name").toString(), frame);

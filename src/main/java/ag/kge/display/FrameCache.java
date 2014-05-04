@@ -27,4 +27,9 @@ public enum FrameCache {
         System.out.println(frameName  + " added.");
     }
 
+    public void refreshFrames() {
+        for (JFrame x: cache.values()){
+            x.pack();
+        }
+    }
 }

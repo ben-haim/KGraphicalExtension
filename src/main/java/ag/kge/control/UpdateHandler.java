@@ -1,9 +1,9 @@
 package ag.kge.control;
 
 import ag.kge.c;
+import ag.kge.display.FrameCache;
 
 import java.lang.reflect.Array;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -91,7 +91,6 @@ public class UpdateHandler implements Runnable {
         updateStack.add(ModelCache.INSTANCE.parseData(value));
 
         ModelCache.INSTANCE.updateModel(name, updateStack);
-
+        FrameCache.INSTANCE.refreshFrames();
     }
-
 }
