@@ -22,7 +22,7 @@ public class TextFieldController extends AbstractController {
     public TextFieldController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
         binding = template.get("binding").toString();
-        textField = new JTextField(10);
+        textField = new JTextField();
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,7 +68,7 @@ public class TextFieldController extends AbstractController {
      * @return generated query String
      */
     private String generateNumericQuery() {
-        String t = textField.getText();
+        String t = textField.getText().trim();
         String n[] = binding.split("\\.");
         String m = generateAmend(n);
 
@@ -136,7 +136,7 @@ public class TextFieldController extends AbstractController {
             } else return; //else something wrong with update
 
             //if problem with update, current stays as is
-            textField.setText(current);
+            textField.setText("  " + current + "  ");
 
         } else { //the head is the complete data
             if (head instanceof char[]) isCharArray = true;
@@ -144,7 +144,8 @@ public class TextFieldController extends AbstractController {
                 isNumber = true;
             }
             String out = filterData(head);
-            textField.setText(out);
+            textField.setText("  " + out + "  ");
+
         }
     }
 

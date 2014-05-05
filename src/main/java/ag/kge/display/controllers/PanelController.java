@@ -24,13 +24,12 @@ public class PanelController extends AbstractController {
 
         this.outQueue = outQueue;
         hasDataBinding = filterData(template);
-//        setMinimumSize(new Dimension(75,150));
         setLayout(new GridBagLayout());
         setName(template.get("name").toString());
         if (!hasDataBinding)
             addChildrenToPanel(template);
         else {
-            ModelCache.INSTANCE.addObserver(this.binding = template.get("binding").toString(),this);
+            ModelCache.INSTANCE.addObserver(this.binding = template.get("binding").toString(), this);
             outQueue.add("gUpdate[`" + binding + "; ()]");
         }
     }
@@ -76,7 +75,6 @@ public class PanelController extends AbstractController {
                     gbc.gridheight= 1;
 
                 gbc.fill = GridBagConstraints.HORIZONTAL;
-
                 if (h.containsKey("x"))
                     gbc.gridx = (Integer) h.get("x");
                 else
@@ -120,6 +118,7 @@ public class PanelController extends AbstractController {
                 c.setBorder(new TitledBorder(template.get("label").toString()));
                 return c;
             case "list": return new ListController(template,outQueue);
+            case "check": return new CheckButtonController(template,outQueue);
         }
 
         return null;
