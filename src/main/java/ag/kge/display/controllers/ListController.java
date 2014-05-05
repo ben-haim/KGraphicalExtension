@@ -2,13 +2,14 @@ package ag.kge.display.controllers;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.table.TableModel;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.Observable;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,30 +17,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by Adnan on 04/05/2014.
  */
-public class ListController extends AbstractController implements ListDataListener {
+public class ListController extends AbstractController {
 
+    private final ArrayList<JTextField> textFields = new ArrayList<>();
     private final LinkedBlockingQueue<String> outQueue;
-    private final DefaultListModel<Object> model;
+
     private int lastChangedIndex = 0;
     private final String label;
+
+
     public ListController(TreeMap<String, Object> template, LinkedBlockingQueue<String> outQueue) {
         this.outQueue = outQueue;
-        model = new DefaultListModel<>();
-        JList<Object> list = new JList<>(model);
         setName(template.get("name").toString());
         binding = template.get("binding").toString();
         label = template.get("label").toString();
-        model.addListDataListener(this);
-        JScrollPane pane = new JScrollPane(list);
-        pane.setPreferredSize(new Dimension(75, 150));
-        add(pane);
+        setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+
     }
 
     @Override
     public String generateQuery() {
 
         //variables names are stored using namespace indexing
-        String t = model.get(lastChangedIndex).toString();
+        String t = textFields.get(lastChangedIndex).getText();
         String[] n = binding.split("\\.");
         String m;
 
@@ -84,57 +84,51 @@ public class ListController extends AbstractController implements ListDataListen
         Object head = updateList.get(0);
 
         if (updateList.size() == 1){
-            //at this point the head should be the full data
-            model.clear();
 
-            for (int i =0; i < Array.getLength(head); i++){
-                model.add(i,filterData(Array.get(head, i)));
+            removeAll();
+            textFields.clear();
+            JTextField temp;
+            String x;
+            for (int i = 0;i < Array.getLength(head); i++){
+
+                x = filterData(Array.get(head,i));
+                temp = new JTextField(x);
+//                temp.setPreferredSize(new Dimension(100,40));
+                temp.setBorder(new TitledBorder("[" + i +"]"));
+                temp.setName(""+i);
+                temp.setActionCommand(""+i);
+                temp.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        lastChangedIndex = Integer.parseInt(e.getActionCommand());
+                        outQueue.add(generateQuery());
+                    }
+                });
+                textFields.add(temp);
+                add(temp);
             }
+
         } else {
 
             //indices exist, treat as single index
             int ind;
             Object data = updateList.get(1);
 
-            //incase we have a bulk index update
-            if (head instanceof int[] &&
-                    data instanceof Object[] &&
-                    Array.getLength(head) == Array.getLength(data)){
-
-                for (int j = 0; j < Array.getLength(head); j++){
-                    ind = (int) Array.get(head,j);
-                    model.set(ind, filterData(Array.get(data,j)));
-                }
-            } else if (isNumeric(head)){
+            if (isNumeric(head)){
                 //if it's a single index change
-                ind = (int) head;
-                model.set(ind,filterData(data));
+                ind = (int)head;
+
+                //incase the data is a singular
+                if (data.getClass().isArray() && Array.getLength(data)==1)
+                    data = Array.get(data,0);
+
+                textFields.get(ind).setText(filterData(data));
 
             }
         }
 
-        setBorder(new TitledBorder(label + ":" + model.getSize()));
+        setBorder(new TitledBorder(label + ":" + textFields.size()));
 
-
-    }
-
-    @Override
-    public void intervalAdded(ListDataEvent e) {
-
-    }
-
-    @Override
-    public void intervalRemoved(ListDataEvent e) {
-
-    }
-
-    @Override
-    public void contentsChanged(ListDataEvent e) {
-
-        if (e.getIndex0() == e.getIndex1()){
-            lastChangedIndex = e.getIndex0();
-            outQueue.add(generateQuery());
-        }
 
     }
 }

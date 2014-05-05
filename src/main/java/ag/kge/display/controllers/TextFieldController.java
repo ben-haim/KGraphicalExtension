@@ -22,7 +22,6 @@ public class TextFieldController extends AbstractController {
     public TextFieldController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
         binding = template.get("binding").toString();
-
         textField = new JTextField(10);
         textField.addActionListener(new ActionListener() {
             @Override
@@ -31,8 +30,6 @@ public class TextFieldController extends AbstractController {
             }
         });
         setName(template.get("name").toString());
-
-
         setBorder(new TitledBorder(template.get("label").toString()));
         add(textField);
 
@@ -86,11 +83,9 @@ public class TextFieldController extends AbstractController {
         }
 
         if (n.length > 1) {
-            System.out.println("Uses Dot Indexing");
             m += "];"; //close dot indexing
-        }
-        else m+=";"; //otherwise just close statement
-        System.out.println(m);
+        } else m+=";"; //otherwise just close statement
+        //System.out.println(m);
         return m;
     }
 
@@ -153,7 +148,6 @@ public class TextFieldController extends AbstractController {
             }
             String out = filterData(head);
             textField.setText(out);
-            textField.setColumns(out.length()+2);
         }
     }
 

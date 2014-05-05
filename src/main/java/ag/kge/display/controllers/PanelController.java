@@ -24,7 +24,7 @@ public class PanelController extends AbstractController {
 
         this.outQueue = outQueue;
         hasDataBinding = filterData(template);
-        setMinimumSize(new Dimension(75,150));
+//        setMinimumSize(new Dimension(75,150));
         setLayout(new GridBagLayout());
         setName(template.get("name").toString());
         if (!hasDataBinding)
@@ -69,7 +69,7 @@ public class PanelController extends AbstractController {
 
                 gbc.gridwidth = (Integer) h.get("width");
                 gbc.gridheight = (Integer) h.get("height");
-
+                gbc.fill = GridBagConstraints.HORIZONTAL;
                 if (h.containsKey("x"))
                     gbc.gridx = (Integer) h.get("x");
                 else

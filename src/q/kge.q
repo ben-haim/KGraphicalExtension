@@ -1,11 +1,12 @@
 .g.h:();
 
 gUpdate: {[v;i]
-	s: $[()~i; //check if i is empty
-		value v; //use the whole variable
-		.[value v; i]; //use the indexed variable
-		];
-	show s;
+	$[()~i; //check if i is empty
+		s:value v; //use the whole variable
+		$[7h = type i;
+		    s:(value v)[i:`int$(i)];
+		    s:.[value v;i]
+		]];
 	(neg .g.h) (`update; v; i; s)}; //send update async
 
 gShow: {[gui]
