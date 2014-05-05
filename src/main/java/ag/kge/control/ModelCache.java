@@ -62,7 +62,7 @@ public enum ModelCache {
 
             return treeMap;
         } else if (data instanceof c.Flip) {
-            return new KTableModel((c.Flip)data);
+            return ""; //empty string for tables, will work on later
         } else return data;
     }
 
