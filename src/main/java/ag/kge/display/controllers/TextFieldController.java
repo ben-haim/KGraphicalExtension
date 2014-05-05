@@ -90,11 +90,11 @@ public class TextFieldController extends AbstractController {
     public String filterData(Object data) {
         if (data instanceof char[])//takes char array
             return new String((char[]) data);
-        else if (!(data instanceof HashMap) &&
+        else if (!(data instanceof Map) &&
                 !(data instanceof TableModel) &&
                 !(data.getClass().isArray()))
             return data.toString();
-        else return "(...)";
+        else return "(...)"; //needs atom
     }
 
     @Override

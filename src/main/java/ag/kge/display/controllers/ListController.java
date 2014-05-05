@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import java.util.Map;
 import java.util.Observable;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -69,10 +70,10 @@ public class ListController extends AbstractController {
     public String filterData(Object data) {
         if (data instanceof char[])//takes char array
             return new String((char[]) data);
-        else if (!(data instanceof TreeMap) &&
+        else if (!(data instanceof Map) &&
                 !(data instanceof TableModel) &&
                 !(data.getClass().isArray()))
-            return data.toString();
+            return data.toString(); //needs atom
         else return "(...)";
     }
 
