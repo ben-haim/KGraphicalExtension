@@ -23,7 +23,6 @@ public class UpdateHandler implements Runnable {
         while (true) try{
             parseUpdate(updateQueue.take());
         } catch (InterruptedException e) {
-            e.printStackTrace();
             System.exit(1);
         }
     }

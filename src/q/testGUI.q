@@ -42,6 +42,4 @@ gui3.wV.c: `list;
 gui3.l:"Super GUI";
 gui3.c:`panel;
 
-
-
-system("l src/q/kge.q")
+system("l gui/kge.q")

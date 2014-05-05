@@ -16,4 +16,6 @@ gHide: {[name] (neg .g.h) (`hide;name)};
 
 gKill:{(neg .g.h) (enlist `kill); .z.vs::; .g.h::;};
 
-gInit:{.g.h::.z.w; .z.vs::gUpdate};
+gInit:{
+    .g.h::.z.w;
+    .z.vs::gUpdate };

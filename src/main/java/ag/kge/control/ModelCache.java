@@ -21,8 +21,6 @@ public enum ModelCache {
      */
     INSTANCE;
 
-
-
     /**
      * Contains the model's mapped to their names as
      */
@@ -35,10 +33,7 @@ public enum ModelCache {
      * @param updateStack the stack containing the update data
      */
     protected synchronized void updateModel(String name, ArrayList updateStack) {
-        System.out.println("Update called on: " + name);
-
         //call notify observers on the model
-        System.out.println("Obs at update: " + cache.get(name).countObservers());
         cache.get(name).callUpdate(updateStack);
     }
 
@@ -83,7 +78,6 @@ public enum ModelCache {
             cache.put(modelName, new KDataModel());
         }
 
-        System.out.println("Adding Observer to " + modelName);
         cache.get(modelName).addObserver(observer);
     }
 }

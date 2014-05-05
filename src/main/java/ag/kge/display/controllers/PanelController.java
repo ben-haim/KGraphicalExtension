@@ -140,7 +140,6 @@ public class PanelController extends AbstractController {
         } else {
             return false;
         }
-
     }
 
     @Override
@@ -170,19 +169,15 @@ public class PanelController extends AbstractController {
 
         } else {
             //the head is a symbol of the name of the child to be udpate
-            System.out.println("Panel Update Received");
-
             String childName = head.toString();
+
             List newList = updateList.subList(1, updateList.size());
+
             for (AbstractController x: children){
-                System.out.println(x.getName());
                 if (x.getName().equals(childName)){
                     x.update(null,newList);
                 }
-
             }
-
         }
-
     }
 }

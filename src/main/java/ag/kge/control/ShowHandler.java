@@ -30,7 +30,6 @@ public class ShowHandler implements Runnable {
                             (c.Dict) message[1])
             );
         } catch (InterruptedException e) {
-            e.printStackTrace();
             System.exit(1);
         }
     }

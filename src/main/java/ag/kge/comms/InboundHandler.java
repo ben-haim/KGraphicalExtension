@@ -36,10 +36,8 @@ public class InboundHandler implements Runnable{
                     readMessage(in);
             }
         } catch (c.KException|IOException e) {
-            e.printStackTrace();
             System.exit(1);
         }
-
     }
 
     private void readMessage(Object msg){

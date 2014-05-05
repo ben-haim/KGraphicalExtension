@@ -36,7 +36,6 @@ public class RenderingEngine implements Runnable {
             createAndShow(templateQueue.take());
         } catch (InterruptedException e) {
             e.printStackTrace();
-            System.exit(1);
         }
     }
 
