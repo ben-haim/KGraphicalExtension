@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableModel;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
@@ -118,17 +117,13 @@ public class ListController extends AbstractController {
                 //if it's a single index change
                 ind = (int)head;
 
-                //incase the data is a singular
+                //in case the data is a singular
                 if (data.getClass().isArray() && Array.getLength(data)==1)
                     data = Array.get(data,0);
 
                 textFields.get(ind).setText(filterData(data));
-
             }
         }
-
         setBorder(new TitledBorder(label + ":" + textFields.size()));
-
-
     }
 }

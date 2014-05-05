@@ -38,7 +38,7 @@ public class TextFieldController extends AbstractController {
     @Override
     public String generateQuery() {
 
-        if (isNumber)
+        if (isNumber) //check if numeric value
             return generateNumericQuery();
 
         //variables names are stored using namespace indexing
@@ -47,9 +47,6 @@ public class TextFieldController extends AbstractController {
 
         String m = generateAmend(n);
 
-        /*
-        numeric data only checked by numfieldcontroller
-        */
         String v = "\"" + t + "\""; //set it up as a char array
 
         //cast to symbol if it's not a char array
@@ -85,7 +82,6 @@ public class TextFieldController extends AbstractController {
         if (n.length > 1) {
             m += "];"; //close dot indexing
         } else m+=";"; //otherwise just close statement
-        //System.out.println(m);
         return m;
     }
 
@@ -103,10 +99,11 @@ public class TextFieldController extends AbstractController {
 
     @Override
     public void update(Observable o, Object arg) {
+
         int pointer = 0;
         List updateList = (List) arg;
-        //pop off the head of the stack
-        System.out.println(getName() + " stack " + updateList.size());
+
+        //get the head of the stack
         Object head = updateList.get(pointer);
         pointer++;
 

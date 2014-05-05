@@ -31,8 +31,7 @@ public class PanelController extends AbstractController {
             addChildrenToPanel(template);
         else {
             ModelCache.INSTANCE.addObserver(this.binding = template.get("binding").toString(),this);
-            outQueue.add("gUpdate[`"+binding+"; ()]");
-            System.out.println("gUpdate[`"+binding+"; ()]");
+            outQueue.add("gUpdate[`" + binding + "; ()]");
         }
     }
 
@@ -49,8 +48,6 @@ public class PanelController extends AbstractController {
         template.put("label",variable);
         template.put("binding",this.binding + "." +variable);
         template.put("class", "data");
-        template.put("width", 1);
-        template.put("height", 1);
         return template;
     }
 
@@ -67,9 +64,19 @@ public class PanelController extends AbstractController {
             if (x instanceof TreeMap) {
                 TreeMap<String,Object> h = (TreeMap<String, Object>) x;
 
-                gbc.gridwidth = (Integer) h.get("width");
-                gbc.gridheight = (Integer) h.get("height");
+
+                if (h.containsKey("width"))
+                    gbc.gridwidth= (Integer) h.get("width");
+                else
+                    gbc.gridwidth= 1;
+
+                if (h.containsKey("height"))
+                    gbc.gridheight = (Integer) h.get("height");
+                else
+                    gbc.gridheight= 1;
+
                 gbc.fill = GridBagConstraints.HORIZONTAL;
+
                 if (h.containsKey("x"))
                     gbc.gridx = (Integer) h.get("x");
                 else

@@ -83,14 +83,13 @@ public class RenderingEngine implements Runnable {
 
             TreeMap h;
             for (String x: template.keySet()) {
-                if (!possibleAttributes.contains(x) && //if the value isn't an attribute
-                        template.get(x) instanceof HashMap) { //and it's a dictionary
+                if (!(possibleAttributes.contains(x)) && //if the value isn't an attribute
+                        template.get(x) instanceof TreeMap) { //and it's a dictionary
                     //then it must be a child widget
                     h = (TreeMap) template.get(x);
                     topPanel.add(createControllerHierarchy(h));
                 }
             }
-
             return topPanel;
         }
 

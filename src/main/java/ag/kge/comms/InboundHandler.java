@@ -49,10 +49,8 @@ public class InboundHandler implements Runnable{
             return;
         }
 
-        System.out.println("Message Received");
 
         Object[] message = (Object[]) msg;
-        System.out.println(Arrays.asList(message));
         String cmd = message[0].toString();
 
         switch (cmd){

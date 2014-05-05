@@ -77,9 +77,6 @@ public class UpdateHandler implements Runnable {
             name = names.toString();
         }
 
-
-
-        System.out.println(name);
         //now we can check if the cache contains the data
         if (!ModelCache.INSTANCE.checkExists(name)) return;
 
