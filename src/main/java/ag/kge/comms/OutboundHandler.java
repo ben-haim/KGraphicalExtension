@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by adnan on 25/04/14.
+ * Sends all outbound messages from the system.
  */
 public class OutboundHandler implements Runnable {
 
@@ -19,16 +19,16 @@ public class OutboundHandler implements Runnable {
     }
 
     /**
-     * Takes outbound messages off the outbound queue and sends them back to the server
+     * Takes messages off the outbound queue and sends them back to the server
      * as a query.
      */
     @Override
     public void run() {
-
         while (true) try  {
             String out = outQueue.take();
-            conn.ks(out);
+            conn.ks(out); //send query
         } catch (IOException | InterruptedException e) {
+            //if the thread is interrupted or the connection is lost, exit
             System.exit(1);
         }
     }

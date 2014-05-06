@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 /**
- * Created by Adnan on 03/05/2014.
+ * A blank class to which widget controllers can subscribe to.
  */
 public class KDataModel extends Observable {
 
-    public void callUpdate(ArrayList updateList){
+    /**
+     * Need to call setChanged() before notifying observers
+     * @param updateList
+     */
+    public void sendUpdate(ArrayList updateList){
         setChanged();
-
         notifyObservers(updateList);
     }
 

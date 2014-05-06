@@ -38,30 +38,32 @@ public class ShowHandler implements Runnable {
 
 
     /**
-     * Parses a c.Dict into a pre-formatted hashmap, defaulting values for class, label, etc..
+     * Parses a c.Dict into a pre-formatted TreeMap, defaulting values for class, label, etc..
      *
-     * @param name
-     * @param infoDict
-     * @return
+     * @param name name of gui
+     * @param infoDict original GUI dictionary
+     * @return a treemap containing a GUI template
      */
     public TreeMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
 
-
-
         TreeMap<String, Object> template = new TreeMap<>();
+
+        //set the name
         template.put("name", name);
-        int i = 0;
+        int i = 0; //ignores null index in dictionaries
         if (Array.get(infoDict.x, 0).toString().equals("")) i = 1;
 
         String currentX;
         Object currentY;
 
         //pre-format
-        template.put("value", new String[]{}); //puts some blank data that can't be displayed by text controllers
+
+        //puts some blank data that can't be displayed by text controllers
+        template.put("value", new String[]{});
         template.put("class", "data"); //sets default class to data
         template.put("width", 1);
         template.put("height", 1);
-        template.put("x", 0); //gbc defaults x and y to -1
+        template.put("x", 0); //grid bag layout defaults x and y to -1
         template.put("y", 0);
 
         for (; i < Array.getLength(infoDict.x); i++) {
@@ -70,27 +72,27 @@ public class ShowHandler implements Runnable {
             currentY = c.at(infoDict.y, i);
 
             switch (currentX) {
-                case "c":
+                case "c": //class attribute
                     template.put("class", currentY);
                     break;
-                case "l":
+                case "l": //label attribute
                     if (currentY instanceof String)
                         template.put("label", currentY);
-                    else if (currentY instanceof char[])
+                    else if (currentY instanceof char[]) //could be a char[] or sym
                         template.put("label", new String((char[]) currentY));
-                    else
+                    else //wrong type error
                         System.out.println("Error: attribute type (l)");
                     break;
-                case "b":
-                    if (currentY instanceof String) {
+                case "b": //binding attribute
+                    if (currentY instanceof String) { //symbol, standard binding
                         template.put("binding", currentY);
-                    } else if (currentY instanceof char[]) {
+                    } else if (currentY instanceof char[]) { //char[], button command
                         template.put("binding", new String((char[]) currentY));
-                    }else{
+                    }else{ //wrong type error
                         System.out.println("Error: attribute type (b)");
                     }
                     break;
-                case "w":
+                case "w": //integers not cast with "i" are evaluated as longs in K
                     if ((currentY instanceof Integer) || (currentY instanceof Long))
                         template.put("width", currentY);
                     else
@@ -119,7 +121,8 @@ public class ShowHandler implements Runnable {
                     break;
                 //any other attributes can be added later
                 default:
-                    if (currentY instanceof c.Dict) // if it's only some atom, ignore it
+                    if (currentY instanceof c.Dict) // if it's a c.Dict, start parsing
+                    //again for child widget
                         template.put(currentX, parseShowMessage(currentX, (c.Dict) currentY));
             }
         }
@@ -130,7 +133,6 @@ public class ShowHandler implements Runnable {
                 template.put("label", template.get("binding").toString());
             else  //2nd default label is widget name
                 template.put("label", name);
-
 
         return template;
     }

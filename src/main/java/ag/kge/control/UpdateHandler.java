@@ -5,10 +5,14 @@ import ag.kge.display.FrameCache;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by adnan on 26/04/14.
+ * From the update message, creates a list of updates to send to the
+ * observers in the model cache.
+ * Also parses c.Dict objects into a TreeMap for later use with the
+ * controllers
  */
 public class UpdateHandler implements Runnable {
 
@@ -47,14 +51,11 @@ public class UpdateHandler implements Runnable {
         String name;
 
         /*
-        The updates in the widget controllers are handled by popping off
-        a stack represented by the arraydeque, where the bottom of the stack
-        contains the data.
-
-        The popped value could be an index, in which case the widget should try
-        to call the update method on the child widget with the index
+        The updates in the widget controllers are handled by reading
+        from the updateList. The front of the list contains the
+        indices, the tail of the list contains the actual data
         */
-        ArrayList<Object> updateStack = new ArrayList<>();
+        ArrayList<Object> updateList = new ArrayList<>();
 
         /*
         The name that comes on the update message may be an array of strings.
@@ -70,7 +71,7 @@ public class UpdateHandler implements Runnable {
 
             //add the rest of the array to the deque
             for (int i = 1; i < Array.getLength(names); i++){
-                updateStack.add(c.at(names, i));
+                updateList.add(c.at(names, i));
             }
         } else {
             name = names.toString();
@@ -81,14 +82,39 @@ public class UpdateHandler implements Runnable {
 
         //if it does, put the rest of the indices array on the stack
         for (int i = 0; i < Array.getLength(indices); i++){
-            updateStack.add(c.at(indices,i));
+            updateList.add(c.at(indices, i));
         }
 
         //add the actual data to the bottom of the stack/tail of deque
-        //putting it through the parser first
-        updateStack.add(ModelCache.INSTANCE.parseData(value));
+        //putting it through the data parser first
+        updateList.add(parseData(value));
 
-        ModelCache.INSTANCE.updateModel(name, updateStack);
+        ModelCache.INSTANCE.updateModel(name, updateList);
         FrameCache.INSTANCE.refreshFrames();
+    }
+
+    /**
+     * Converts complex K data into their native java type, i.e. dictionaries to HashMaps
+     * and tables to KTableModel. Otherwise returns the data as is.
+     *
+     * @param data the data to be parsed
+     * @return the converted data
+     */
+    private Object parseData(Object data) {
+        if (data instanceof c.Dict){
+            TreeMap<String, Object> treeMap = new TreeMap<>();
+            c.Dict d = (c.Dict) data;
+            int i = 0;
+            if (c.at(d.x,0) == "") i++;
+
+            for (; i < Array.getLength(d.x); i++){
+                treeMap.put(c.at(d.x, i).toString(),
+                        parseData(c.at(d.y, i)));
+            }
+
+            return treeMap;
+        } else if (data instanceof c.Flip) {
+            return ""; //empty string for tables, will work on later
+        } else return data;
     }
 }

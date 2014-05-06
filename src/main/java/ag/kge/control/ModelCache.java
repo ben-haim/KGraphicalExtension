@@ -1,9 +1,5 @@
 package ag.kge.control;
 
-import ag.kge.c;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,37 +30,14 @@ public enum ModelCache {
      */
     protected synchronized void updateModel(String name, ArrayList updateStack) {
         //call notify observers on the model
-        cache.get(name).callUpdate(updateStack);
+        cache.get(name).sendUpdate(updateStack);
     }
 
     public synchronized boolean checkExists(String name){
         return cache.containsKey(name);
     }
 
-    /**
-     * Converts complex K data into their native java type, i.e. dictionaries to HashMaps
-     * and tables to KTableModel. Otherwise returns the data as is.
-     *
-     * @param data the data to be parsed
-     * @return the converted data
-     */
-    public synchronized Object parseData(Object data) {
-        if (data instanceof c.Dict){
-            TreeMap<String, Object> treeMap = new TreeMap<>();
-            c.Dict d = (c.Dict) data;
-            int i = 0;
-            if (c.at(d.x,0) == "") i++;
 
-            for (; i < Array.getLength(d.x); i++){
-                treeMap.put(c.at(d.x, i).toString(),
-                        parseData(c.at(d.y, i)));
-            }
-
-            return treeMap;
-        } else if (data instanceof c.Flip) {
-            return ""; //empty string for tables, will work on later
-        } else return data;
-    }
 
     /**
      * Checks if some data object is currently maintained on the server, if not a blank observable is added to the

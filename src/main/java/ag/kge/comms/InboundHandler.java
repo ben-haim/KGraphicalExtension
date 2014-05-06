@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by adnan on 25/04/14.
+ * Listens to the connection object for messages from the kdb+ server, and handles them appropriately *
  */
 public class InboundHandler implements Runnable{
 
@@ -31,37 +31,47 @@ public class InboundHandler implements Runnable{
     public void run() {
         Object in;
         while (true) try{
-            //not sure why it would ever be null
+            //c.qn checks if a K object is null
             if (!c.qn(in = conn.k())){
                     readMessage(in);
             }
         } catch (c.KException|IOException e) {
+            //if the connection is lost, exit
             System.exit(1);
         }
     }
 
+    /**
+     * Handles inbound messages from kdb+
+     *
+     * @param msg the object containing the inbound message
+     */
     private void readMessage(Object msg){
 
+        //since the kge.q script only ever sends an array of objects, anything that isn't an
+        //array should be ignored
         if (!msg.getClass().isArray()){
             System.out.println(msg.toString());
             return;
         }
 
-
+        //cast message as array
         Object[] message = (Object[]) msg;
+
+        //the command is the first message in the array
         String cmd = message[0].toString();
 
         switch (cmd){
-            case "show":
+            case "show": //push to the show queue
                 showQueue.add(new Object[]{message[1], message[2]});
                 break;
-            case "hide":
+            case "hide": //hide the frame with the string at message[1]
                 FrameCache.INSTANCE.hideFrame(message[1].toString());
                 break;
-            case "update":
+            case "update": //add the name, indices, and update data to update queue
                 updateQueue.add(new Object[]{message[1], message[2], message[3]});
                 break;
-            case "kill":
+            case "kill": //exit the system
                 System.exit(0);
         }
 
@@ -69,22 +79,25 @@ public class InboundHandler implements Runnable{
     }
 
     /**
-     * Main method, opens connection and starts threads
+     * Main method, opens connection to server given an integer argument, and starts  threads
      *
-     * @param args
+     * @param args first element in array should be a integer
      */
     public static void main(String[] args) {
         int port = 0;
+
+        //if the argument cannot be parsed as an integer, there is something wrong, so exit.
         if (args.length == 1) try{
             port = Integer.parseInt(args[0]);
         } catch (NumberFormatException e){
             System.err.println("Error: Invalid Port Given");
             System.exit(1);
-        } else {
+        } else { //there is also something wrong if more than one argument is given
             System.err.println("Error: Invalid Arguments Given");
             System.exit(1);
         }
 
+        //the connection object to the kbd+ server
         c conn = null;
 
         try {
@@ -97,12 +110,14 @@ public class InboundHandler implements Runnable{
             System.exit(1);
         }
 
-
+        //outbound message queue
         final LinkedBlockingQueue<String> outQueue = new LinkedBlockingQueue<>();
+        //gui dictionary queue
         final LinkedBlockingQueue<Object[]> showQueue = new LinkedBlockingQueue<>();
+        //update message queue
         final LinkedBlockingQueue<Object[]> updateQueue = new LinkedBlockingQueue<>();
+        //gui template queue
         final LinkedBlockingQueue<TreeMap> templateQueue = new LinkedBlockingQueue<>();
-
 
         //communication layer threads
         new Thread(new InboundHandler(conn,showQueue, updateQueue)).start();
