@@ -6,7 +6,7 @@
 
     <groupId>ag.kge</groupId>
     <artifactId>KGraphicalExtension</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -27,6 +27,8 @@
                             <mainClass>ag.kge.comms.InboundHandler</mainClass>
                         </manifest>
                     </archive>
+                    <finalName>KGE-${project.version}</finalName>
+
                 </configuration>
 
             </plugin>

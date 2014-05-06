@@ -22,16 +22,13 @@ public enum FrameCache {
     }
 
     public synchronized void addFrame(String frameName, JFrame frame){
+        //if the frame already exists, destroy it
         if (cache.containsKey(frameName))
             cache.remove(frameName).setVisible(false);
+
         cache.put(frameName,frame);
         cache.get(frameName).setVisible(true);
         System.out.println(frameName  + " added.");
-    }
-
-    public synchronized boolean checkFrameExists(String name){
-        if (cache.containsKey(name)) return true;
-        return false;
     }
 
     /**

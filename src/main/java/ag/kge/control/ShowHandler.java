@@ -27,12 +27,10 @@ public class ShowHandler implements Runnable {
         while (true) try {
             Object[] message = showQueue.take();
 
-            //check that the frame exists before getting continuing.
-            if (!FrameCache.INSTANCE.checkFrameExists(message[0].toString()))
-                templateQueue.put( //send it to createAndShow after parsing.
-                    parseShowMessage(message[0].toString(),
-                            (c.Dict) message[1])
-                );
+            templateQueue.put( //send it to createAndShow after parsing.
+                parseShowMessage(message[0].toString(),
+                        (c.Dict) message[1])
+            );
         } catch (InterruptedException e) {
             System.exit(1);
         }
