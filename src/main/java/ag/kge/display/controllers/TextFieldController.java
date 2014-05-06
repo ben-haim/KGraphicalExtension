@@ -41,8 +41,8 @@ public class TextFieldController extends AbstractController {
         if (isNumber) //check if numeric value
             return generateNumericQuery();
 
-        //variables names are stored using namespace indexing
-        String t = textField.getText();
+        //variables names are stored using dot indexing
+        String t = textField.getText().trim();
         String[] n = binding.split("\\.");
 
         String m = generateAmend(n);

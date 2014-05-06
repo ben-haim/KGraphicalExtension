@@ -2,13 +2,11 @@ package ag.kge.display;
 
 import ag.kge.control.ModelCache;
 import ag.kge.display.controllers.AbstractController;
-import ag.kge.display.controllers.PanelController;
+import ag.kge.display.controllers.FormController;
 import ag.kge.display.controllers.TextFieldController;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -52,8 +50,8 @@ public class RenderingEngine implements Runnable {
     }
 
     /**
-     * Creates a default frame from a template, passing off to panel controller for better appearance control if
-     * class is panel, and then storing it in the frame cache
+     * Creates a default frame from a template, passing off to form controller for better appearance control if
+     * class is form, and then storing it in the frame cache
      *
      * @param template
      */
@@ -62,10 +60,10 @@ public class RenderingEngine implements Runnable {
         AbstractController c;
         String binding;
 
-        if (template.get("class").equals("panel")){
+        if (template.get("class").equals("form")){
 
-            //if it's a panel, let the panel controller deal with everything
-            return new PanelController(template, outQueue);
+            //if it's a form, let the form controller deal with everything
+            return new FormController(template, outQueue);
 
         } else if (template.containsKey("binding")){
 

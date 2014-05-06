@@ -1,6 +1,7 @@
 package ag.kge.control;
 
 import ag.kge.c;
+import ag.kge.display.FrameCache;
 
 import java.lang.reflect.Array;
 
@@ -25,10 +26,13 @@ public class ShowHandler implements Runnable {
     public void run() {
         while (true) try {
             Object[] message = showQueue.take();
-            templateQueue.put( //send it to createAndShow after parsing.
+
+            //check that the frame exists before getting continuing.
+            if (!FrameCache.INSTANCE.checkFrameExists(message[0].toString()))
+                templateQueue.put( //send it to createAndShow after parsing.
                     parseShowMessage(message[0].toString(),
                             (c.Dict) message[1])
-            );
+                );
         } catch (InterruptedException e) {
             System.exit(1);
         }
@@ -43,6 +47,9 @@ public class ShowHandler implements Runnable {
      * @return
      */
     public TreeMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
+
+
+
         TreeMap<String, Object> template = new TreeMap<>();
         template.put("name", name);
         int i = 0;

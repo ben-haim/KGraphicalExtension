@@ -22,11 +22,24 @@ public enum FrameCache {
     }
 
     public synchronized void addFrame(String frameName, JFrame frame){
+        if (cache.containsKey(frameName))
+            cache.remove(frameName).setVisible(false);
         cache.put(frameName,frame);
         cache.get(frameName).setVisible(true);
         System.out.println(frameName  + " added.");
     }
 
+    public synchronized boolean checkFrameExists(String name){
+        if (cache.containsKey(name)) return true;
+        return false;
+    }
+
+    /**
+     * Repacks all the frames in the cache. This is necessary due to the nature of sending an initial
+     * update request to populate the widgets, otherwise they will stay in their shrunken sizes as if they
+     * have no data
+     *
+     */
     public void refreshFrames() {
         for (JFrame x: cache.values()){
             x.pack();

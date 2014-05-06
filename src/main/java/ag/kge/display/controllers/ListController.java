@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableModel;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
@@ -32,7 +33,6 @@ public class ListController extends AbstractController {
         binding = template.get("binding").toString();
         label = template.get("label").toString();
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-
     }
 
     @Override
@@ -94,9 +94,9 @@ public class ListController extends AbstractController {
                 x = filterData(Array.get(head,i));
                 temp = new JTextField(x);
 //                temp.setPreferredSize(new Dimension(100,40));
-                temp.setBorder(new TitledBorder("[" + i +"]"));
-                temp.setName(""+i);
-                temp.setActionCommand(""+i);
+                temp.setBorder(new TitledBorder("[" + i + "]"));
+                temp.setName("" + i);
+                temp.setActionCommand("" + i);
                 temp.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -125,6 +125,7 @@ public class ListController extends AbstractController {
                 textFields.get(ind).setText(filterData(data));
             }
         }
+
         setBorder(new TitledBorder(label + ":" + textFields.size()));
     }
 }

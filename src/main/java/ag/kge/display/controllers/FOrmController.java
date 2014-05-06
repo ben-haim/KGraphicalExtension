@@ -2,7 +2,6 @@ package ag.kge.display.controllers;
 
 import ag.kge.control.ModelCache;
 
-import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.*;
@@ -12,15 +11,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by adnan on 26/04/14.
  */
-public class PanelController extends AbstractController {
+public class FormController extends AbstractController {
 
     private final LinkedList<AbstractController> children = new LinkedList<>();
     private final GridBagConstraints gbc = new GridBagConstraints();
     private final LinkedBlockingQueue<String> outQueue;
     private final boolean hasDataBinding;
 
-    public PanelController(TreeMap<String, Object> template,
-                           LinkedBlockingQueue<String> outQueue){
+    public FormController(TreeMap<String, Object> template,
+                          LinkedBlockingQueue<String> outQueue){
 
         this.outQueue = outQueue;
         hasDataBinding = filterData(template);
@@ -47,6 +46,11 @@ public class PanelController extends AbstractController {
         template.put("label",variable);
         template.put("binding",this.binding + "." +variable);
         template.put("class", "data");
+        template.put("width", 1);
+        template.put("height", 1);
+        template.put("x", 0); //gbc defaults x and y to -1
+        template.put("y", 0);
+
         return template;
     }
 
@@ -56,7 +60,7 @@ public class PanelController extends AbstractController {
      */
     private void addChildrenToPanel(TreeMap<String,Object> template){
 
-        int maxY = 1;
+        int maxY = 0;
         AbstractController widget;
         String currentB;
         for (Object x: template.values())
@@ -74,7 +78,8 @@ public class PanelController extends AbstractController {
                 else
                     gbc.gridheight= 1;
 
-                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.fill = GridBagConstraints.BOTH;
+
                 if (h.containsKey("x"))
                     gbc.gridx = (Integer) h.get("x");
                 else
@@ -87,6 +92,11 @@ public class PanelController extends AbstractController {
                     gbc.gridy = maxY;
                     maxY++;
                 }
+
+                if (h.get("class").equals("list"))
+                    gbc.ipadx=20;
+                else
+                    gbc.ipadx=0;
 
                 children.add(widget = selectController(h));
 
@@ -109,18 +119,15 @@ public class PanelController extends AbstractController {
     private AbstractController selectController(TreeMap<String,Object> template) {
 
         switch (template.get("class").toString()){
-            case "data":
-                return new TextFieldController(template,outQueue);
-            case "button":
-                return new ButtonController(template,outQueue);
-            case "panel": //needs to externally set panel label
-                AbstractController c =  new PanelController(template,outQueue);
-                c.setBorder(new TitledBorder(template.get("label").toString()));
-                return c;
+            case "data": return new TextFieldController(template,outQueue);
+            case "button": return new ButtonController(template,outQueue);
             case "list": return new ListController(template,outQueue);
             case "check": return new CheckButtonController(template,outQueue);
+            case "form": //needs to externally set label
+                AbstractController c =  new FormController(template,outQueue);
+                c.setBorder(new TitledBorder(template.get("label").toString()));
+                return c;
         }
-
         return null;
     }
 
