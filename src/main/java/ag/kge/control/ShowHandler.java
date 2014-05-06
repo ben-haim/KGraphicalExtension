@@ -1,16 +1,12 @@
 package ag.kge.control;
 
 import ag.kge.c;
-import ag.kge.display.FrameCache;
 
 import java.lang.reflect.Array;
 
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by adnan on 25/04/14.
- */
 public class ShowHandler implements Runnable {
 
     private final LinkedBlockingQueue<Object[]> showQueue;
@@ -27,7 +23,7 @@ public class ShowHandler implements Runnable {
         while (true) try {
             Object[] message = showQueue.take();
 
-            templateQueue.put( //send it to createAndShow after parsing.
+            templateQueue.put( //send it to rendering engine after parsing.
                 parseShowMessage(message[0].toString(),
                         (c.Dict) message[1])
             );
@@ -84,40 +80,31 @@ public class ShowHandler implements Runnable {
                         System.out.println("Error: attribute type (l)");
                     break;
                 case "b": //binding attribute
-                    if (currentY instanceof String) { //symbol, standard binding
+                    if (currentY instanceof String)  //symbol, standard binding
                         template.put("binding", currentY);
-                    } else if (currentY instanceof char[]) { //char[], button command
+                    else if (currentY instanceof char[]) { //char[], button command
                         template.put("binding", new String((char[]) currentY));
-                    }else{ //wrong type error
-                        System.out.println("Error: attribute type (b)");
-                    }
+                    }else System.out.println("Error: attribute type (b)");
                     break;
-                case "w": //integers not cast with "i" are evaluated as longs in K
-                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                case "w": //grid bag constraints require integers
+                    if ((currentY instanceof Integer))
                         template.put("width", currentY);
-                    else
-                        System.out.println("Error: attribute type (w)");
+                    else System.out.println("Error: attribute type (w)");
                     break;
                 case "h":
-                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                    if ((currentY instanceof Integer))
                         template.put("height", currentY);
-                    else
-                        System.out.println("Error: attribute type (h)");
-
+                    else System.out.println("Error: attribute type (h)");
                     break;
                 case "x":
-                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                    if ((currentY instanceof Integer))
                         template.put("x", currentY);
-                    else
-                        System.out.println("Error: attribute type (x)");
-
+                    else System.out.println("Error: attribute type (x)");
                     break;
                 case "y":
-                    if ((currentY instanceof Integer) || (currentY instanceof Long))
+                    if ((currentY instanceof Integer))
                         template.put("y", currentY);
-                    else
-                        System.out.println("Error: attribute type (y)");
-
+                    else System.out.println("Error: attribute type (y)");
                     break;
                 //any other attributes can be added later
                 default:

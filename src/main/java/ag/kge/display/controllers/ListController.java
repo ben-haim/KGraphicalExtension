@@ -16,10 +16,13 @@ import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by Adnan on 04/05/2014.
+ * Displays a one-dimensional array in a list of text fields
  */
 public class ListController extends AbstractController {
 
+    /**
+     * store the text field objects in an array list
+     */
     private final ArrayList<JTextField> textFields = new ArrayList<>();
     private final LinkedBlockingQueue<String> outQueue;
 
@@ -38,7 +41,6 @@ public class ListController extends AbstractController {
     @Override
     public String generateQuery() {
 
-        //variables names are stored using namespace indexing
         String t = textFields.get(lastChangedIndex).getText();
         String[] n = binding.split("\\.");
         String m;
@@ -51,8 +53,7 @@ public class ListController extends AbstractController {
             for (int i = 1; i < n.length;i++){
                 m+= "`" + n[i]+ ";";
             }
-
-            m+= lastChangedIndex + ");:;";
+            m+= lastChangedIndex + ");:;"; //add index to dot amend
         } else {
             m = n[0] + "[" + lastChangedIndex + "]:";
         }
@@ -84,33 +85,38 @@ public class ListController extends AbstractController {
         Object head = updateList.get(0);
 
         if (updateList.size() == 1){
+            //if a whole list is sent with no indices, replace current list
 
-            removeAll();
-            textFields.clear();
+            removeAll(); //clear components on panel
+            textFields.clear(); //clear textFields list
             JTextField temp;
             String x;
-            for (int i = 0;i < Array.getLength(head); i++){
 
+            //iterate through update array
+            for (int i = 0;i < Array.getLength(head); i++){
+                //get the data in array at i
                 x = filterData(Array.get(head,i));
+                //create new text field
                 temp = new JTextField(x);
-//                temp.setPreferredSize(new Dimension(100,40));
+                //add the index to the title of the field
                 temp.setBorder(new TitledBorder("[" + i + "]"));
-                temp.setName("" + i);
-                temp.setActionCommand("" + i);
+                temp.setActionCommand("" + i); //used to set changed index integer
+
                 temp.addActionListener(new ActionListener() {
-                    @Override
+                    @Override //set last changed index and add query to queue
                     public void actionPerformed(ActionEvent e) {
                         lastChangedIndex = Integer.parseInt(e.getActionCommand());
                         outQueue.add(generateQuery());
                     }
                 });
                 textFields.add(temp);
+                //add temp field to panel
                 add(temp);
             }
 
         } else {
 
-            //indices exist, treat as single index
+            //indices exist, treat as single index for now
             int ind;
             Object data = updateList.get(1);
 
@@ -118,14 +124,15 @@ public class ListController extends AbstractController {
                 //if it's a single index change
                 ind = (int)head;
 
-                //in case the data is a singular
+                //if the data is a singular i.e. treat as single index change
                 if (data.getClass().isArray() && Array.getLength(data)==1)
                     data = Array.get(data,0);
 
+                //set text at index
                 textFields.get(ind).setText(filterData(data));
             }
         }
-
+        //add array size to border
         setBorder(new TitledBorder(label + ":" + textFields.size()));
     }
 }

@@ -12,12 +12,17 @@ import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by Adnan on 03/05/2014.
+ * Renders a JFrame using the template, sets up the observable, adds
+ * frame to cache, and calls initial update... if the form class has
+ * not been set
  */
 public class RenderingEngine implements Runnable {
 
     private final LinkedBlockingQueue<String> outQueue;
     private final LinkedBlockingQueue<TreeMap> templateQueue;
+    /**
+     * List of available attributes
+     */
     private final List<String> possibleAttributes = Arrays.asList(
             "class","label","binding", "width", "height", "x", "y", "name");
 
@@ -37,21 +42,26 @@ public class RenderingEngine implements Runnable {
         }
     }
 
-
+    /**
+     * Creates a JFrame and adds it to the cache
+     * @param template
+     */
     private void createAndShow(TreeMap<String,Object> template) {
 
         JFrame frame = new JFrame(template.get("label").toString());
         frame.setContentPane(createControllerHierarchy(template));
         frame.pack();
-        frame.setLocationRelativeTo(null);
+        frame.setLocationRelativeTo(null); //puts frame in middle of screen
+
         FrameCache.INSTANCE.addFrame(template.get("name").toString(), frame);
         //don't want to set default close operation to exit, since we may have multiple frames
+        //on screen
 
     }
 
     /**
-     * Creates a default frame from a template, passing off to form controller for better appearance control if
-     * class is form, and then storing it in the frame cache
+     * Recursively add widgets to a default frame, passing off to form controller for
+     * better appearance control if class is form and calling initita update as required
      *
      * @param template
      */
@@ -74,7 +84,7 @@ public class RenderingEngine implements Runnable {
             return c;
 
         } else {
-            //it probably is a pane without class set as panel, use data
+            //it probably is a dict without class set as form, use data
             JPanel topPanel = new JPanel();
             topPanel.setLayout(new BoxLayout(topPanel,BoxLayout.Y_AXIS));
 
@@ -85,11 +95,9 @@ public class RenderingEngine implements Runnable {
                     //then it must be a child widget
                     h = (TreeMap) template.get(x);
                     topPanel.add(createControllerHierarchy(h));
-                }
+                } //ignoring other variables
             }
             return topPanel;
         }
-
     }
-
 }

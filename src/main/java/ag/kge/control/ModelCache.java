@@ -18,9 +18,9 @@ public enum ModelCache {
     INSTANCE;
 
     /**
-     * Contains the model's mapped to their names as
+     * Contains the Observables mapped to their variable names
      */
-    private final ConcurrentHashMap<String, KDataModel> cache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, KObservable> cache = new ConcurrentHashMap<>();
 
     /**
      * Sends a stack containing update data to the observers of a given variable
@@ -33,11 +33,10 @@ public enum ModelCache {
         cache.get(name).sendUpdate(updateStack);
     }
 
+    //checks if a variable exists on the server
     public synchronized boolean checkExists(String name){
         return cache.containsKey(name);
     }
-
-
 
     /**
      * Checks if some data object is currently maintained on the server, if not a blank observable is added to the
@@ -48,7 +47,7 @@ public enum ModelCache {
      */
     public synchronized void addObserver(String modelName, Observer observer){
         if (!cache.containsKey(modelName)){
-            cache.put(modelName, new KDataModel());
+            cache.put(modelName, new KObservable());
         }
 
         cache.get(modelName).addObserver(observer);

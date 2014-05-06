@@ -9,19 +9,18 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by adnan on 25/04/14.
- */
 public class TextFieldController extends AbstractController {
 
     private JTextField textField;
 
+    //for type persistence
     private boolean isCharArray = false;
     private boolean isNumber = false;
 
     public TextFieldController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
 
         binding = template.get("binding").toString();
+
         textField = new JTextField();
         textField.addActionListener(new ActionListener() {
             @Override
@@ -35,6 +34,12 @@ public class TextFieldController extends AbstractController {
 
     }
 
+    /**
+     * Generates the query to be sent back to the server when the text field value
+     * changes
+     *
+     * @return outbound string
+     */
     @Override
     public String generateQuery() {
 
@@ -45,7 +50,7 @@ public class TextFieldController extends AbstractController {
         String t = textField.getText().trim();
         String[] n = binding.split("\\.");
 
-        String m = generateAmend(n);
+        String m = generateAmend(n); //generates first half of amend
 
         String v = "\"" + t + "\""; //set it up as a char array
 
@@ -86,17 +91,31 @@ public class TextFieldController extends AbstractController {
     }
 
 
+    /**
+     * Filters data to only allow char arrays and atoms.
+     *
+     * @param data input data
+     * @return the string that is displayed
+     */
     @Override
     public String filterData(Object data) {
         if (data instanceof char[])//takes char array
             return new String((char[]) data);
         else if (!(data instanceof Map) &&
-                !(data instanceof TableModel) &&
+                !(data instanceof TableModel) && //tablemodel to be used with tables
                 !(data.getClass().isArray()))
             return data.toString();
         else return "(...)"; //needs atom
     }
 
+    /**
+     * Updates a text field. The update list can either be the complete data, a single
+     * index with a character, or a list of indices and a list of corresponding characters
+     * (bulk indexing)
+     *
+     * @param o
+     * @param arg the update list
+     */
     @Override
     public void update(Observable o, Object arg) {
 
@@ -110,12 +129,11 @@ public class TextFieldController extends AbstractController {
         //if the stack isn't empty, the head is an index
         if (!(updateList.size() == 1)){
             //if not currently a char array, return as index into symbol doesn't mean anything
-            if (!isCharArray){
-                return;
-            }
+            if (!isCharArray) return;
 
             Object data = updateList.get(pointer);
             String current = textField.getText();
+
             int ind;
             //if the index and data have a one to one mapping
             if (head instanceof int[] &&
@@ -126,13 +144,10 @@ public class TextFieldController extends AbstractController {
                     ind = (int)Array.get(head,i);
                     current = replaceCharAt(current,ind, (char)Array.get(data,i));
                 }
-
             } else if (head instanceof Integer && data instanceof Character){
-
                 //data is a single character as needed
                 ind = (int)head;
                 current = replaceCharAt(current,ind,(char)data);
-
             } else return; //else something wrong with update
 
             //if problem with update, current stays as is
@@ -140,30 +155,26 @@ public class TextFieldController extends AbstractController {
 
         } else { //the head is the complete data
             if (head instanceof char[]) isCharArray = true;
-            if (isNumeric(head)) {
+            if (isNumeric(head))
                 isNumber = true;
-            }
             String out = filterData(head);
             textField.setText("  " + out + "  ");
-
         }
     }
 
     /**
-     * Replaces character at a given location in a string. Can also append a character.
+     * Replaces character at a given location in a string.
      *
-     * @param current
-     * @param index
-     * @param insert
+     * @param current current whole string
+     * @param index index of new char
+     * @param insert new char value
      * @return
      */
     private String replaceCharAt(String current, int index, char insert){
         if (index <= current.length())
             return current.substring(0,index-1) +
                 insert + current.substring(index, current.length());
-        else if (index == current.length() + 1){
-            return current + insert;
-        } else return "";
+         else return "";
     }
 
 }

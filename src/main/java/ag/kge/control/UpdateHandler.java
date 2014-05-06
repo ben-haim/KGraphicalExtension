@@ -89,7 +89,10 @@ public class UpdateHandler implements Runnable {
         //putting it through the data parser first
         updateList.add(parseData(value));
 
+        //sends the update message to the model cache
         ModelCache.INSTANCE.updateModel(name, updateList);
+
+        //refreshes the frames in the frame cache
         FrameCache.INSTANCE.refreshFrames();
     }
 
@@ -105,16 +108,17 @@ public class UpdateHandler implements Runnable {
             TreeMap<String, Object> treeMap = new TreeMap<>();
             c.Dict d = (c.Dict) data;
             int i = 0;
-            if (c.at(d.x,0) == "") i++;
+            if (c.at(d.x,0) == "") i++; //ignores the null index
 
+            //recursively puts data into treeMap
             for (; i < Array.getLength(d.x); i++){
-                treeMap.put(c.at(d.x, i).toString(),
-                        parseData(c.at(d.y, i)));
+                treeMap.put(Array.get(d.x, i).toString(),
+                        parseData(Array.get(d.y, i)));
             }
 
             return treeMap;
         } else if (data instanceof c.Flip) {
             return ""; //empty string for tables, will work on later
-        } else return data;
+        } else return data; //return the data, it's either an atom or list
     }
 }

@@ -6,7 +6,7 @@ import java.util.Observable;
 /**
  * A blank class to which widget controllers can subscribe to.
  */
-public class KDataModel extends Observable {
+public class KObservable extends Observable {
 
     /**
      * Need to call setChanged() before notifying observers
@@ -18,3 +18,5 @@ public class KDataModel extends Observable {
     }
 
 }
+
+

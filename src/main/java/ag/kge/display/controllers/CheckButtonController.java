@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by Adnan on 05/05/2014.
+ * A check button for boolean values
  */
 public class CheckButtonController extends AbstractController {
 
@@ -30,6 +30,7 @@ public class CheckButtonController extends AbstractController {
                 outQueue.add(generateQuery());
             }
         });
+        //respond to item events
 
         add(checkBox);
 
@@ -38,18 +39,14 @@ public class CheckButtonController extends AbstractController {
     @Override
     public String generateQuery() {
         String m = generateAmend(binding.split("\\."));
-        if (checkBox.isSelected()){
+        if (checkBox.isSelected())
             m += "1b";
-        } else {
-            m+="0b";
-        }
+        else m += "0b";
 
-        if (binding.length() > 1){
+        if (binding.length() > 1)
             m += "]";
-        }
 
         m+=";";
-
         return m;
     }
 
@@ -64,8 +61,9 @@ public class CheckButtonController extends AbstractController {
         List updateList = (List) arg;
         Object head;
         if (updateList.size() == 1){
-
+            // only handle atoms
             if ((head = updateList.get(0)) instanceof Boolean){
+                //only respond to booleans
                 checkBox.setSelected((Boolean)head);
                 setBorder(null);
             } else {
