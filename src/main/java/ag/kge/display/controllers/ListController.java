@@ -30,7 +30,8 @@ public class ListController extends AbstractController {
     private final String label;
 
 
-    public ListController(TreeMap<String, Object> template, LinkedBlockingQueue<String> outQueue) {
+    public ListController(TreeMap<String, Object> template,
+                          LinkedBlockingQueue<String> outQueue) {
         this.outQueue = outQueue;
         setName(template.get("name").toString());
         binding = template.get("binding").toString();
@@ -105,7 +106,8 @@ public class ListController extends AbstractController {
                 temp.addActionListener(new ActionListener() {
                     @Override //set last changed index and add query to queue
                     public void actionPerformed(ActionEvent e) {
-                        lastChangedIndex = Integer.parseInt(e.getActionCommand());
+                        lastChangedIndex = Integer.parseInt(
+                                e.getActionCommand());
                         outQueue.add(generateQuery());
                     }
                 });

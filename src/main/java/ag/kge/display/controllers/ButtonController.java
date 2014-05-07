@@ -23,11 +23,12 @@ public class ButtonController extends AbstractController{
         button = new JButton(template.get("label").toString());
         cmd = filterData(template.get("binding"));
         button.addActionListener(new ActionListener() {
+            //put the command string on queue
             @Override
             public void actionPerformed(ActionEvent e) {
                 outQueue.add(cmd);
             }
-        }); //put the command string on queue
+        });
         add(button);
     }
 
@@ -37,7 +38,9 @@ public class ButtonController extends AbstractController{
     }
 
     /**
-     * The show handler parses char arrays given as a binding into a string
+     * The show handler parses char arrays given as a binding
+     * into a string
+     *
      * @param data
      * @return
      */

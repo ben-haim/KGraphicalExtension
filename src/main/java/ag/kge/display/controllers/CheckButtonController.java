@@ -17,7 +17,8 @@ public class CheckButtonController extends AbstractController {
     private final JCheckBox checkBox;
     private final LinkedBlockingQueue<String> outQueue;
 
-    public CheckButtonController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
+    public CheckButtonController(TreeMap<String, Object> template,
+                                 final LinkedBlockingQueue<String> outQueue) {
 
         this.outQueue = outQueue;
         binding = template.get("binding").toString();
@@ -25,12 +26,12 @@ public class CheckButtonController extends AbstractController {
 
         checkBox = new JCheckBox(template.get("label").toString());
         checkBox.addItemListener(new ItemListener() {
+            //respond to item events
             @Override
             public void itemStateChanged(ItemEvent e) {
                 outQueue.add(generateQuery());
             }
         });
-        //respond to item events
 
         add(checkBox);
 

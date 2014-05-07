@@ -16,8 +16,9 @@ public class TextFieldController extends AbstractController {
     //for type persistence
     private boolean isCharArray = false;
     private boolean isNumber = false;
-
-    public TextFieldController(TreeMap<String, Object> template, final LinkedBlockingQueue<String> outQueue) {
+    private final String label;
+    public TextFieldController(TreeMap<String, Object> template,
+                               final LinkedBlockingQueue<String> outQueue) {
 
         binding = template.get("binding").toString();
 
@@ -29,14 +30,14 @@ public class TextFieldController extends AbstractController {
             }
         });
         setName(template.get("name").toString());
-        setBorder(new TitledBorder(template.get("label").toString()));
+        setBorder(new TitledBorder(label = template.get("label").toString()));
         add(textField);
 
     }
 
     /**
-     * Generates the query to be sent back to the server when the text field value
-     * changes
+     * Generates the query to be sent back to the server when the text
+     * field value changes
      *
      * @return outbound string
      */
@@ -67,8 +68,8 @@ public class TextFieldController extends AbstractController {
     }
 
     /**
-     * Generates the amend if the current data is a number, throwing an error if non numeric
-     * data in text field.
+     * Generates the amend if the current data is a number, throwing an
+     * error if non numeric data in text field.
      *
      * @return generated query String
      */
@@ -76,11 +77,11 @@ public class TextFieldController extends AbstractController {
         String t = textField.getText().trim();
         String n[] = binding.split("\\.");
         String m = generateAmend(n);
-
+        setBorder(new TitledBorder(label));
         if (isNumeric(t)){
             m += t;
         } else {
-            textField.setText("ERROR: NOT A NUMBER");
+            setBorder(new TitledBorder(("ERROR: NOT A NUMBER")));
             return "";
         }
 
@@ -102,16 +103,17 @@ public class TextFieldController extends AbstractController {
         if (data instanceof char[])//takes char array
             return new String((char[]) data);
         else if (!(data instanceof Map) &&
-                !(data instanceof TableModel) && //tablemodel to be used with tables
+                !(data instanceof TableModel) &&
+                //tablemodel to be used with tables
                 !(data.getClass().isArray()))
             return data.toString();
         else return "(...)"; //needs atom
     }
 
     /**
-     * Updates a text field. The update list can either be the complete data, a single
-     * index with a character, or a list of indices and a list of corresponding characters
-     * (bulk indexing)
+     * Updates a text field. The update list can either be the complete data,
+     * a single index with a character, or a list of indices and a list of
+     * corresponding characters (bulk indexing)
      *
      * @param o
      * @param arg the update list
@@ -128,7 +130,8 @@ public class TextFieldController extends AbstractController {
 
         //if the stack isn't empty, the head is an index
         if (!(updateList.size() == 1)){
-            //if not currently a char array, return as index into symbol doesn't mean anything
+            //if not currently a char array, return as index into symbol
+            // doesn't mean anything
             if (!isCharArray) return;
 
             Object data = updateList.get(pointer);
@@ -142,9 +145,11 @@ public class TextFieldController extends AbstractController {
 
                 for (int i = 0; i < Array.getLength(head);i++){
                     ind = (int)Array.get(head,i);
-                    current = replaceCharAt(current,ind, (char)Array.get(data,i));
+                    current = replaceCharAt(current,ind,
+                            (char)Array.get(data,i));
                 }
-            } else if (head instanceof Integer && data instanceof Character){
+            } else if (head instanceof Integer &&
+                    data instanceof Character){
                 //data is a single character as needed
                 ind = (int)head;
                 current = replaceCharAt(current,ind,(char)data);
@@ -170,10 +175,12 @@ public class TextFieldController extends AbstractController {
      * @param insert new char value
      * @return
      */
-    private String replaceCharAt(String current, int index, char insert){
+    private String replaceCharAt(String current, int index,
+                                 char insert){
         if (index <= current.length())
             return current.substring(0,index-1) +
-                insert + current.substring(index, current.length());
+                insert + current.substring(index,
+                        current.length());
          else return "";
     }
 

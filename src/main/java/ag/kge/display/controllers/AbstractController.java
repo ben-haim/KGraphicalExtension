@@ -6,7 +6,9 @@ import java.util.*;
 /**
  * The super class for all widget controllers
  */
-public abstract class AbstractController extends JPanel implements Observer{
+public abstract class AbstractController extends JPanel
+        implements Observer
+{
 
     /**
      * The name of the associated variable
@@ -19,7 +21,9 @@ public abstract class AbstractController extends JPanel implements Observer{
 
 
     /**
-     * takes an array of strings and generates the first half of a dot index amend
+     * takes an array of strings and generates the first half of a
+     * dot index amend
+     *
      * @param n the name of the binding variable, split by periods
      * @return
      */

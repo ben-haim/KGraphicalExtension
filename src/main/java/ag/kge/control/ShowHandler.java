@@ -34,13 +34,15 @@ public class ShowHandler implements Runnable {
 
 
     /**
-     * Parses a c.Dict into a pre-formatted TreeMap, defaulting values for class, label, etc..
+     * Parses a c.Dict into a pre-formatted TreeMap, defaulting values for
+     * class, label, etc..
      *
      * @param name name of gui
      * @param infoDict original GUI dictionary
      * @return a treemap containing a GUI template
      */
-    public TreeMap<String, Object> parseShowMessage(String name, c.Dict infoDict) {
+    public TreeMap<String, Object> parseShowMessage(String name, c.Dict infoDict)
+    {
 
         TreeMap<String, Object> template = new TreeMap<>();
 
@@ -80,9 +82,11 @@ public class ShowHandler implements Runnable {
                         System.out.println("Error: attribute type (l)");
                     break;
                 case "b": //binding attribute
-                    if (currentY instanceof String)  //symbol, standard binding
+                    if (currentY instanceof String)
+                        //symbol, standard binding
                         template.put("binding", currentY);
-                    else if (currentY instanceof char[]) { //char[], button command
+                    else if (currentY instanceof char[]) {
+                        //char[], button command
                         template.put("binding", new String((char[]) currentY));
                     }else System.out.println("Error: attribute type (b)");
                     break;
@@ -110,13 +114,16 @@ public class ShowHandler implements Runnable {
                 default:
                     if (currentY instanceof c.Dict) // if it's a c.Dict, start parsing
                     //again for child widget
-                        template.put(currentX, parseShowMessage(currentX, (c.Dict) currentY));
+                        template.put(currentX,
+                                parseShowMessage(currentX, (c.Dict) currentY));
             }
         }
 
         //post-format
         if (!template.containsKey("label"))
-            if (template.containsKey("binding")) //1st default label is binding name
+            //1st default label is binding name for non-buttons
+            if (template.containsKey("binding") &&
+                    !template.get("class").equals("button"))
                 template.put("label", template.get("binding").toString());
             else  //2nd default label is widget name
                 template.put("label", name);
