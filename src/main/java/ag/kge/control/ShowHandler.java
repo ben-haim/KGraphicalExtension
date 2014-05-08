@@ -61,8 +61,8 @@ public class ShowHandler implements Runnable {
         template.put("class", "data"); //sets default class to data
         template.put("width", 1);
         template.put("height", 1);
-        template.put("x", 0); //grid bag layout defaults x and y to -1
-        template.put("y", 0);
+//        template.put("x", 0); //grid bag layout defaults x and y to -1
+//        template.put("y", 0);
 
         for (; i < Array.getLength(infoDict.x); i++) {
 

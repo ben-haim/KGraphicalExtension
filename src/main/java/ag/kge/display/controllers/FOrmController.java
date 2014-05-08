@@ -92,7 +92,7 @@ public class FormController extends AbstractController {
                     if (maxY <= gbc.gridy) maxY = gbc.gridy + 1;
                     //increase maximum y value
                 } else {
-                    gbc.gridy = maxY;
+                    gbc.gridy = 0;
                     maxY++; //place widget at maxY before incrementing
                 }
 
@@ -160,6 +160,7 @@ public class FormController extends AbstractController {
         ArrayList updateList = (ArrayList) arg;
         Object head = updateList.get(0);
         TreeMap templateData;
+
         if (head instanceof TreeMap){
             //whole dictionary given
 
