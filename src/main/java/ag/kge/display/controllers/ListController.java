@@ -25,10 +25,9 @@ public class ListController extends AbstractController {
      */
     private final ArrayList<JTextField> textFields = new ArrayList<>();
     private final LinkedBlockingQueue<String> outQueue;
-
+    private boolean isIntVec, isCharVec, isFloatVec;
     private int lastChangedIndex = 0;
     private final String label;
-
 
     public ListController(TreeMap<String, Object> template,
                           LinkedBlockingQueue<String> outQueue) {
@@ -37,12 +36,13 @@ public class ListController extends AbstractController {
         binding = template.get("binding").toString();
         label = template.get("label").toString();
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+
     }
 
     @Override
     public String generateQuery() {
 
-        String t = textFields.get(lastChangedIndex).getText();
+        String t = textFields.get(lastChangedIndex).getText().trim();
         String[] n = binding.split("\\.");
         String m;
 
@@ -59,8 +59,25 @@ public class ListController extends AbstractController {
             m = n[0] + "[" + lastChangedIndex + "]:";
         }
 
-        m+= "`$\"" + t + "\""; //set it up as a char array
 
+        if (isIntVec) try {
+            m+= Integer.parseInt(t);
+        } catch (NumberFormatException e){
+            setBorder(new TitledBorder("ERROR: VECTOR"));
+            return "";
+        } else if (isFloatVec) try {
+            m+= Double.parseDouble(t);
+        } catch (NumberFormatException e){
+            setBorder(new TitledBorder("ERROR: VECTOR"));
+            return "";
+        } else if (isCharVec) {
+            if(t.length() == 1)
+                m+= "\"" + t + "\"";
+            else
+                setBorder(new TitledBorder("ERROR: VECTOR"));
+        } else {
+            m += "`$\"" + t + "\""; //set it up as a char array
+        }
         if (n.length > 1)
             m += "];"; //close dot indexing
         else m+=";"; //otherwise just close statement
@@ -92,6 +109,17 @@ public class ListController extends AbstractController {
             textFields.clear(); //clear textFields list
             JTextField temp;
             String x;
+
+            if (head instanceof int[] ||
+                    head instanceof long[] ||
+                    head instanceof short[] ||
+                    head instanceof byte[]){
+                isIntVec = true;
+            } else if (head instanceof double[] || head instanceof float[]){
+                isFloatVec = true;
+            } else if (head instanceof char[]){
+                isCharVec = true;
+            }
 
             //iterate through update array
             for (int i = 0;i < Array.getLength(head); i++){
