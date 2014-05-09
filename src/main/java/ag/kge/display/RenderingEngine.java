@@ -6,7 +6,9 @@ import ag.kge.display.controllers.FormController;
 import ag.kge.display.controllers.TextFieldController;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,6 +33,14 @@ public class RenderingEngine implements Runnable {
                            LinkedBlockingQueue<TreeMap> templateQueue) {
         this.outQueue = outQueue;
         this.templateQueue = templateQueue;
+        javax.swing.plaf.FontUIResource f = new javax.swing.plaf.FontUIResource("Sans-Serif",Font.PLAIN,20);
+        Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get (key);
+            if (value != null && value instanceof javax.swing.plaf.FontUIResource)
+                UIManager.put (key, f);
+        }
     }
 
     @Override

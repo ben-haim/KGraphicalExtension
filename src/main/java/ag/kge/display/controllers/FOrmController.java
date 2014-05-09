@@ -61,7 +61,6 @@ public class FormController extends AbstractController {
      */
     private void addChildrenToPanel(TreeMap<String,Object> template){
 
-        int maxY = 0;
         AbstractController widget;
         String currentB;
         for (Object x: template.values())
@@ -89,12 +88,8 @@ public class FormController extends AbstractController {
                 //puts variables in a list if their y values have not been set
                 if (h.containsKey("y")) {
                     gbc.gridy = (Integer) h.get("y");
-                    if (maxY <= gbc.gridy) maxY = gbc.gridy + 1;
-                    //increase maximum y value
-                } else {
+                } else
                     gbc.gridy = 0;
-                    maxY++; //place widget at maxY before incrementing
-                }
 
                 if (h.get("class").equals("list"))
                     gbc.ipadx=20; //prevents lists from being too thin
@@ -173,6 +168,13 @@ public class FormController extends AbstractController {
             for (Object x: templateData.keySet())
                 createMap.put(x.toString(),
                         createDefaultTemplate(x.toString()));
+
+            int maxY = 0;
+
+            for (Object x: createMap.values()){
+                ((TreeMap) x).put("y", maxY);
+                maxY++;
+            }
 
             addChildrenToPanel(createMap);
             //add children using new template
