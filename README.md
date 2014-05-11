@@ -14,7 +14,7 @@ Compile using `mvn package`, place the jar file wherever.
 ###GUI Dictionary Attributes
 The following “attributes” in the GUI dictionary are read by the KGE:
  * `.b` : the “binding” attribute variable, takes a variable name as a symbol, or a char array if the widget is class `button
- * `.c` : the class attribute, which can be `data, `list, `button, `form or `check. Only valid when the parent’s class is `form
+ * `.c` : the class attribute, which can be `data`, `list` , `button`, `form` or `check`. Only valid when the parent’s class is `form`
  * `.l` : the label attribute, can be either a symbol or a string, will be displayed as the frame title if it’s assigned to a root-level widget
  * `.x`, `.y` : the x and y co-ordinates on the GUI frame, starting at `0,0`, replaces the arrangement system from K3.x
  * `.w`, `.h` : the width and height of the widget on the GUI frame. In K3.x, widgets were distributed on a row or column depending on their location inside the ..a nest. This method gives more precision of the space the widget’s takes
