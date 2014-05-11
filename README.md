@@ -32,7 +32,7 @@ Use `gKill []` on the kdb+ session to terminate the KGE process.
 To show a variable in a widget, define the widget as a dictionary with an entry named `b` and assign the entry to the name of the variable. You don’t need to declare a whole dictionary, just the name of the widget with dot notation, .e.g
 
 ```
-txtA.b:`a;
+txtBox.b:`someVar;
 ```
 
 Now you can show and hide them using the `gShow` and `gHide` commands, respectively, passing them the name of the widget/gui as a symbol. Successfully displayed frames will come up in the KGE shell window.
