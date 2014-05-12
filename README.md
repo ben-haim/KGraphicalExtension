@@ -8,8 +8,6 @@ GUI toolkit that can translate a dictionary in kdb+, describing the components o
 The descriptive syntax is similar to K3.x's attributes, except the widget descriptions and the variable are coupled using a `b` attribute.
 
 ##Compilation
-**Switch to develop branch before compiling, I haven't merged into master yet.**
-
 Compile using `mvn package`, place the jar file wherever.
 
 ##KGE Manual
