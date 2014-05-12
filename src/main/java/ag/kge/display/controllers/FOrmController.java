@@ -2,6 +2,7 @@ package ag.kge.display.controllers;
 
 import ag.kge.control.ModelCache;
 
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.*;
