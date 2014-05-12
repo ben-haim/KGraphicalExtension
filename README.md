@@ -10,6 +10,13 @@ The descriptive syntax is similar to K3.x's attributes, except the widget descri
 ##Compilation
 Compile using `mvn package`, place the jar file wherever.
 
+##Adding Features
+Feel free to add to the project. The system architecture is on the wiki page, though knowledge of how `.z.vs` works is preferable for changes to the core system. 
+Other than that, widgets can be added to the ag.kge.display.controllers package by extending the abstract controller class. 
+Queries to be sent back to the kdb+ server (from field changes, button presses, etc.) should be put on the outBound blocking queue, which should be added as part of the constructor.
+Add an extra switch case to the FormController class's `selectController` method. 
+
+
 ##KGE Manual
 ###GUI Dictionary Attributes
 The following “attributes” in the GUI dictionary are read by the KGE:
