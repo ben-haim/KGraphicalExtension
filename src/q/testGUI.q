@@ -54,4 +54,4 @@ gui3.wV.c: `list;
 gui3.l:"Super GUI";
 gui3.c:`form;
 
-system("l gui/kge.q")
+//system("l gui/kge.q") //load the kge.q script manually for now, need to figure out env variables with system()
